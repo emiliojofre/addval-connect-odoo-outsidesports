@@ -171,4 +171,23 @@ class PaymentTxFlow(models.Model):
         }
         client = self.provider_id.flow_get_client()
         response = client.payments.get_from_commerce_id(data)
-        return self.sudo()._get_tx_from_notification_data('flow', response)
+
+        # FIX NLH: antes esto era `self.sudo()._get_tx_from_notification_data(...)`.
+        # Como `self` ya es UN solo registro (por el ensure_one() de arriba),
+        # el override de este método detecta `len(tx) == 1` desde el primer
+        # `super()...` (que en Odoo core simplemente hace `return self`) y
+        # retorna DE INMEDIATO sin leer el status de la respuesta ni tocar la
+        # transacción — sin error, sin log, sin efecto. Por eso el botón
+        # "Obtener Datos usando CommerceID" no hacía nada (confirmado en
+        # producción: nunca se ejecutaba la lógica de más abajo).
+        #
+        # Además, aunque se llamara "unbound" (para que la búsqueda interna
+        # encuentre la transacción por referencia), _get_tx_from_notification_data
+        # por sí solo NUNCA dispara _execute_callback() — el método de Odoo
+        # core que efectivamente confirma la orden de venta asociada. Eso
+        # solo lo hace _handle_notification_data (que internamente llama a
+        # _get_tx_from_notification_data y LUEGO a _execute_callback()) — es
+        # el mismo mecanismo que ya usa flow_form_feedback (el flujo de
+        # retorno del navegador, que sí confirma órdenes hoy). Por eso acá
+        # usamos el mismo método, llamado sobre el modelo (no sobre self).
+        return self.env['payment.transaction'].sudo()._handle_notification_data('flow', response)
