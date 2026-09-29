@@ -8,6 +8,7 @@
     'description': """
         En el website se añade el SKU y el PVP en los productos. 
         Se incluye la opción de calcular tarifas por marca.
+        La descripción de la línea de factura muestra solo el nombre del producto.
     """,
 
     "author": "Addval Connect",
@@ -19,6 +20,7 @@
     'depends': [
         'base',
         'sale',
+        'account',
         'product',
         'website_product_brands'
     ],
