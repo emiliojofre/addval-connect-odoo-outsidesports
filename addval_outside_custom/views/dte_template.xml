@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="dte_subtemplate_nombre_variante" inherit_id="l10n_cl_edi.dte_subtemplate">
+        <xpath expr="//NmbItem" position="attributes">
+            <attribute name="t-esc">format_length((line.name or '').split('\n')[0], 80) or format_length(line.product_id.name, 80)</attribute>
+        </xpath>
+        <xpath expr="//DscItem" position="attributes">
+            <attribute name="t-if">False</attribute>
+        </xpath>
+    </template>
+</odoo>
