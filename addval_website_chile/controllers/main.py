@@ -33,11 +33,8 @@ _BASES = (
     else (WebsiteSaleAddressInfo,)
 )
 
-B2C_WEBSITE_NAME = 'OUTSIDE SPORTS B2C'
-
-
 def _is_b2c():
-    return request.website.name == B2C_WEBSITE_NAME
+    return request.website.chile_b2c_enabled
 
 
 def _validar_rut(rut_raw):

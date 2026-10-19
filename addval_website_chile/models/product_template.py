@@ -5,11 +5,6 @@ from odoo import models
 
 _logger = logging.getLogger(__name__)
 
-# Nombre técnico del sitio B2C tal como está en Website > Sitios.
-# Se busca por nombre (no por ID) para que el módulo funcione igual
-# en dev/test/prod aunque los IDs de website difieran entre ambientes.
-B2C_WEBSITE_NAME = 'OUTSIDE SPORTS B2C'
-
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -26,7 +21,7 @@ class ProductTemplate(models.Model):
         )
 
         website = self.env['website'].get_current_website()
-        if not website or website.name != B2C_WEBSITE_NAME:
+        if not website or not website.chile_b2c_enabled:
             # Cualquier otro sitio (ej. B2B) sigue exactamente igual que hoy.
             return res
 
@@ -77,7 +72,7 @@ class ProductTemplate(models.Model):
         res = super()._get_sales_prices(pricelist)
 
         website = self.env['website'].get_current_website()
-        if not website or website.name != B2C_WEBSITE_NAME:
+        if not website or not website.chile_b2c_enabled:
             return res
 
         currency = website.currency_id or self.env.company.currency_id

@@ -13,7 +13,7 @@
 
         Decision del cliente: mantener ese bloqueo para los demas sitios
         (ej. B2B), pero habilitar el formulario real SOLO en
-        OUTSIDE SPORTS B2C.
+        el sitio marcado con "Aplicar ajustes Chile B2C".
 
         Como la vista generica ya "es" la definicion base para esa key
         (no hereda de nada, mode=primary), la forma correcta de
@@ -31,7 +31,8 @@
         <field name="name">Sign up login (Chile B2C - formulario real)</field>
         <field name="type">qweb</field>
         <field name="key">auth_signup.signup</field>
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
+        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
         <field name="arch" type="xml">
             <t t-name="auth_signup.signup">
                 <t t-call="web.login_layout">
@@ -83,6 +84,7 @@
     </template>
 
     <record id="chile_confirmation_signup_text" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
+        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
     </record>
 </odoo>

@@ -185,7 +185,8 @@
     </template>
 
     <record id="address_chile_rut_phone" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
+        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
     </record>
 
 </odoo>
