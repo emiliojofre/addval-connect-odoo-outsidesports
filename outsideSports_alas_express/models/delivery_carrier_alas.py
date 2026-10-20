@@ -144,14 +144,28 @@ class ProviderAlasExpress(models.Model):
             except ValueError:
                 return {}
 
-        # Manejo de errores conocidos de la API
+        # Manejo de errores conocidos de la API. El body de error NO siempre
+        # es un dict: Alas a veces responde texto plano, HTML o un string/lista
+        # JSON sueltos (ej. en /delivery-orders/reject) — no asumir la forma
+        # de la respuesta, o un .get() sobre un str revienta con AttributeError
+        # y el usuario ve un traceback críptico en vez de un error claro.
         try:
             error_body = resp.json()
-            msg = error_body.get('message') or error_body.get('errors') or resp.text
         except ValueError:
-            msg = resp.text
+            error_body = None
 
-        # Log del payload para debugging
+        if isinstance(error_body, dict):
+            msg = error_body.get('message') or error_body.get('errors') or resp.text or _('(sin mensaje)')
+        else:
+            msg = resp.text or (str(error_body) if error_body is not None else _('(sin mensaje)'))
+
+        # Log del body crudo COMPLETO (más allá de "msg") para poder ver el
+        # error real de Alas la próxima vez que ocurra, sin importar la forma
+        # que tenga la respuesta.
+        _logger.error(
+            'Alas Express ERROR %s %s → HTTP %s. Body crudo: %s',
+            method, endpoint, resp.status_code, resp.text,
+        )
         _logger.error('Alas Express ERROR payload enviado: %s', json.dumps(payload, ensure_ascii=False) if payload else 'N/A')
 
         raise UserError(_(
@@ -203,9 +217,18 @@ class ProviderAlasExpress(models.Model):
         # Códigos de paquetes: uno por unidad de movimiento o por nombre de picking
         products_codes = self._alas_get_package_codes(picking)
 
+        # El identificador externo debe ser el número de la orden de venta
+        # (picking.origin, ej. "SO39305"), NO el correlativo interno de la
+        # operación de bodega (picking.name, ej. "WH/OUT/18154") — este último
+        # generaba un tracking paralelo/desincronizado con lo que ve el
+        # cliente. Fallback a picking.name solo para el caso borde de un
+        # picking sin orden de venta asociada (ej. transferencia interna
+        # convertida a entrega manual), donde origin viene vacío.
+        delivery_order_code = picking.origin or picking.name
+
         payload = {
             'partner': self.alas_partner or '',
-            'deliveryOrderCode': picking.name,
+            'deliveryOrderCode': delivery_order_code,
             'senderCode': self.alas_sender_code or '',
             'receiverFirstName': first_name,
             'receiverLastName': last_name,
@@ -356,7 +379,10 @@ class ProviderAlasExpress(models.Model):
         payload = {
             'partner': self.alas_partner or '',
             'senderCode': self.alas_sender_code or '',
-            'deliveryOrderCode': picking.name,
+            # Mismo identificador usado al crear la orden (ver nota en
+            # _alas_build_delivery_order_payload) — debe coincidir con lo
+            # que Alas tiene registrado para esta orden.
+            'deliveryOrderCode': picking.origin or picking.name,
         }
         result = self._alas_call('POST', '/delivery-orders/label', payload)
         label_b64 = result.get('deliveryLabelsBase64', '')
@@ -373,7 +399,9 @@ class ProviderAlasExpress(models.Model):
         payload = {
             'partner': self.alas_partner or '',
             'senderCode': self.alas_sender_code or '',
-            'deliveryOrderCode': picking.name,
+            # Mismo identificador usado al crear la orden (ver nota en
+            # _alas_build_delivery_order_payload).
+            'deliveryOrderCode': picking.origin or picking.name,
         }
         result = self._alas_call('POST', '/delivery-orders/label-zpl', payload)
         label_b64 = result.get('deliveryLabelsBase64', '')
@@ -393,7 +421,9 @@ class ProviderAlasExpress(models.Model):
         payload = {
             'partner': self.alas_partner or '',
             'senderCode': self.alas_sender_code or '',
-            'deliveryOrderCode': picking.name,
+            # Mismo identificador usado al crear la orden (ver nota en
+            # _alas_build_delivery_order_payload).
+            'deliveryOrderCode': picking.origin or picking.name,
         }
         result = self._alas_call('POST', '/delivery-orders/reject', payload)
         picking.write({'alas_status': result.get('status', 'Rechazada B2B')})

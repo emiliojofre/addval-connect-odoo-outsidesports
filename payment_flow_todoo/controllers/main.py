@@ -45,6 +45,27 @@ class FlowController(http.Controller):
         if not tx_data:
             raise ValidationError("Transacción no esperada")
 
+        # FIX NLH: antes esto terminaba acá — el webhook asíncrono de Flow
+        # (la notificación server-a-server que Flow llama cuando el pago se
+        # confirma, el camino correcto para medios con confirmación demorada
+        # como transferencias vía Khipu) solo logueaba tx_data y no
+        # actualizaba nada. La transacción y la orden de venta quedaban sin
+        # confirmar salvo que el navegador del cliente alcanzara a volver a
+        # /payment/flow/return (flow_form_feedback, más abajo), que es el
+        # único lugar que sí llama _handle_notification_data. Si el cliente
+        # cerraba la pestaña o Flow confirmaba el pago después del retorno,
+        # no quedaba ningún camino que terminara de procesar el pago —
+        # exactamente lo que le pasó a SO39361 (pagado en Flow, nunca
+        # confirmado en Odoo).
+        #
+        # _handle_notification_data es idempotente (Odoo core solo
+        # transiciona desde estados permitidos y no re-ejecuta el callback
+        # de confirmación si ya corrió — ver _update_state/_execute_callback
+        # en odoo/addons/payment/models/payment_transaction.py), así que es
+        # seguro que este webhook y el retorno del navegador procesen la
+        # misma transacción sin duplicar nada.
+        request.env['payment.transaction'].sudo()._handle_notification_data('flow', tx_data)
+
         return ''
 
     @http.route([

@@ -95,13 +95,17 @@
                       string="Alas Express"
                       attrs="{'invisible': [('alas_is_carrier', '=', False)]}">
 
-                    <!-- Semáforo de estado -->
+                    <!-- Semáforo de estado — muestra el estado REAL del picking
+                         (alas_status) más su descripción calculada dinámicamente
+                         (alas_status_description), no un texto fijo. -->
                     <div class="row mb-3"
                          attrs="{'invisible': [('alas_delivery_order_id', '=', False)]}">
                         <div class="col-12">
                             <div class="alert alert-info" role="alert">
                                 <strong>Estado actual: </strong>
                                 <field name="alas_status" nolabel="1" readonly="1"/>
+                                <span> — </span>
+                                <field name="alas_status_description" nolabel="1" readonly="1"/>
                             </div>
                         </div>
                     </div>
@@ -128,8 +132,13 @@
                         </div>
                     </group>
 
-                    <!-- Referencia de estados -->
-                    <group string="Estados posibles Alas Express">
+                    <!-- Referencia de estados — tabla de AYUDA con todos los
+                         estados posibles, no el estado de este envío (ese está
+                         arriba, en el cuadro "Estado actual"). Antes esta tabla
+                         no dejaba claro que era solo una guía, y su fila verde
+                         "Entregado → Entrega exitosa ✅" se prestaba a
+                         confundirse con el estado real del picking. -->
+                    <group string="Guía de referencia — estados posibles en Alas Express (no es el estado de este envío)">
                         <div class="o_field_widget o_wrap_field">
                             <table class="table table-sm table-bordered small" style="margin-top:8px;">
                                 <thead class="table-light">

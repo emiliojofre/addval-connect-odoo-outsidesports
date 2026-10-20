@@ -31,7 +31,7 @@
         <field name="name">Sign up login (Chile B2C - formulario real)</field>
         <field name="type">qweb</field>
         <field name="key">auth_signup.signup</field>
-        <field name="website_id" search="[('id','=',3)]" model="website"/>
+        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
         <field name="arch" type="xml">
             <t t-name="auth_signup.signup">
                 <t t-call="web.login_layout">
@@ -83,6 +83,6 @@
     </template>
 
     <record id="chile_confirmation_signup_text" model="ir.ui.view">
-        <field name="website_id" search="[('id','=',3)]" model="website"/>
+        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
     </record>
 </odoo>

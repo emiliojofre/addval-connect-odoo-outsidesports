@@ -5,6 +5,24 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
+# Estados posibles de Alas Express: color semáforo + descripción legible.
+# Única fuente de verdad para ambos — antes vivían duplicados (un dict de
+# colores acá y un dict de descripciones repetido a mano en el XML de la
+# vista, que no reflejaba el estado real del picking, solo una leyenda fija).
+ALAS_STATUS_INFO = {
+    'Planificación': (0, 'Orden recibida por Alas (estado inicial)'),
+    'Recepción Física': (3, 'Alas recogió las cajas en bodega'),
+    'Entrega Agendada': (3, 'Alas contactó al destinatario'),
+    'Entrega Reagendada': (3, 'Alas reagendó el contacto con el destinatario'),
+    'Entrega Ruteada': (4, 'Ruta del día siguiente generada'),
+    'En Ruta': (10, 'Mensajero en camino'),
+    'Entregado': (10, 'Entrega exitosa ✅'),
+    'Rechazado Agendamiento': (1, 'Destinatario rechazó en contacto ❌'),
+    'Rechazado Terreno': (1, 'Rechazado en el domicilio ❌'),
+    'No Entregable': (1, '3 intentos fallidos ❌'),
+    'Rechazada B2B': (1, 'Orden rechazada manualmente desde Odoo ❌'),
+}
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -55,26 +73,35 @@ class StockPicking(models.Model):
         compute='_compute_alas_status_color',
         store=False,
     )
+    alas_status_description = fields.Char(
+        string='Descripción Estado Alas',
+        compute='_compute_alas_status_description',
+        store=False,
+        help='Descripción legible del estado ACTUAL de este envío (alas_status), '
+             'no una leyenda fija — antes la vista solo mostraba una tabla de '
+             'referencia estática que no reflejaba el dato real del picking.',
+    )
 
     # ── Computados ───────────────────────────────────────────────────────────
 
     @api.depends('alas_status')
     def _compute_alas_status_color(self):
         """Asigna un color semáforo según el estado de Alas."""
-        COLOR_MAP = {
-            'Planificación': 0,           # gris
-            'Recepción Física': 3,        # amarillo
-            'Entrega Agendada': 3,        # amarillo
-            'Entrega Reagendada': 3,      # amarillo
-            'Entrega Ruteada': 4,         # verde claro
-            'En Ruta': 10,               # verde
-            'Entregado': 10,             # verde
-            'Rechazado Agendamiento': 1,  # rojo
-            'Rechazado Terreno': 1,       # rojo
-            'No Entregable': 1,           # rojo
-        }
         for rec in self:
-            rec.alas_status_color = COLOR_MAP.get(rec.alas_status, 0)
+            info = ALAS_STATUS_INFO.get(rec.alas_status)
+            rec.alas_status_color = info[0] if info else 0
+
+    @api.depends('alas_status')
+    def _compute_alas_status_description(self):
+        """Descripción legible del estado ACTUAL (no una leyenda fija)."""
+        for rec in self:
+            info = ALAS_STATUS_INFO.get(rec.alas_status)
+            if info:
+                rec.alas_status_description = info[1]
+            elif rec.alas_status:
+                rec.alas_status_description = _('Estado no reconocido — revisar con Alas Express.')
+            else:
+                rec.alas_status_description = ''
 
     # ── Acciones desde el picking ────────────────────────────────────────────
 
@@ -206,14 +233,26 @@ class StockPicking(models.Model):
     def cron_alas_update_status(self):
         """
         Cron para actualizar el estado de todos los pickings con Alas Express
-        que no estén en estado final.
+        que no estén en estado final EN ALAS.
+
+        OJO: el filtro NO debe mirar el estado interno de bodega
+        (stock.picking.state = done/cancel) — ese estado indica que Odoo
+        completó su propia operación de despacho (que ocurre casi de
+        inmediato al crear la orden en Alas), no que Alas terminó de
+        entregar. Filtrar por él excluía de este cron prácticamente todos
+        los pickings reales, dejando alas_status congelado para siempre en
+        el valor inicial "Planificación" (confirmado en producción: 0
+        pickings procesados en cada corrida durante semanas). El criterio
+        correcto es si el envío en ALAS sigue activo (alas_status no es un
+        estado final de Alas); solo se excluyen los pickings cancelados en
+        Odoo, que ya no tiene sentido seguir rastreando.
         """
-        FINAL_STATES = {'Entregado', 'Rechazado Agendamiento', 'Rechazado Terreno', 'No Entregable'}
+        FINAL_STATES = {'Entregado', 'Rechazado Agendamiento', 'Rechazado Terreno', 'No Entregable', 'Rechazada B2B'}
         pickings = self.search([
             ('carrier_id.delivery_type', '=', 'alas_express'),
             ('alas_delivery_order_id', '!=', False),
             ('alas_status', 'not in', list(FINAL_STATES)),
-            ('state', 'not in', ['cancel', 'done']),
+            ('state', '!=', 'cancel'),
         ])
         _logger.info('Alas Express cron: actualizando %d pickings', len(pickings))
         for picking in pickings:
