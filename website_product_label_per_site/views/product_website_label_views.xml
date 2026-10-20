@@ -7,7 +7,7 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="odoo_website_product_label.odoo_product_template_inherit_bi_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@string='Website Product Label']" position="after">
+            <xpath expr="//field[@name='select_label']/.." position="after">
                 <group string="Labels por sitio web" name="website_labels">
                     <div class="text-muted" colspan="2">
                         Si un sitio no aparece aquí, se muestra la label general de arriba.
