@@ -5,6 +5,9 @@ from odoo import models
 
 _logger = logging.getLogger(__name__)
 
+# ID del sitio "OUTSIDE SPORTS B2C" en Producción (Website > Sitios).
+B2C_WEBSITE_ID = 3
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -21,7 +24,7 @@ class ProductTemplate(models.Model):
         )
 
         website = self.env['website'].get_current_website()
-        if not website or not website.chile_b2c_enabled:
+        if not website or website.id != B2C_WEBSITE_ID:
             # Cualquier otro sitio (ej. B2B) sigue exactamente igual que hoy.
             return res
 
@@ -72,7 +75,7 @@ class ProductTemplate(models.Model):
         res = super()._get_sales_prices(pricelist)
 
         website = self.env['website'].get_current_website()
-        if not website or not website.chile_b2c_enabled:
+        if not website or website.id != B2C_WEBSITE_ID:
             return res
 
         currency = website.currency_id or self.env.company.currency_id

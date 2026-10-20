@@ -49,8 +49,7 @@
     </template>
 
     <record id="chile_shipping_delete_flag" model="ir.ui.view">
-        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
-        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
     <template id="chile_shipping_delete_button"
@@ -73,7 +72,6 @@
     </template>
 
     <record id="chile_shipping_delete_button" model="ir.ui.view">
-        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
-        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 </odoo>

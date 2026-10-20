@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!--
-        Expone un flag JS global SOLO cuando el sitio activo tiene marcado
-        "Aplicar ajustes Chile B2C" (campo del modelo website; no depende
-        del nombre ni del dominio del sitio).
+        Expone un flag JS global SOLO cuando el sitio activo es
+        "OUTSIDE SPORTS B2C" (se identifica por ID de website, id 3 en Produccion).
         website.layout es un extension point universal y estable:
         no depende del tema instalado. No afecta a ningun otro sitio
         (ej. B2B), que renderiza website.layout sin este bloque.
@@ -13,7 +12,7 @@
               name="Chile B2C - Flag de sitio (sin afectar B2B)">
 
         <xpath expr="//head" position="inside">
-            <script t-if="website and website.chile_b2c_enabled" type="text/javascript">
+            <script t-if="website and website.id == 3" type="text/javascript">
                 window.CHILE_B2C = true;
             </script>
         </xpath>

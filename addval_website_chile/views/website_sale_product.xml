@@ -8,8 +8,7 @@
     </template>
 
     <record id="outside_hide_pvp_catalog" model="ir.ui.view">
-        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
-        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
     <template id="outside_hide_pvp_product"
@@ -19,8 +18,7 @@
     </template>
 
     <record id="outside_hide_pvp_product" model="ir.ui.view">
-        <field name="website_id" model="website" eval="obj()._chile_b2c_site().id or ref('website.default_website')"/>
-        <field name="active" model="website" eval="bool(obj()._chile_b2c_site())"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
 </odoo>
