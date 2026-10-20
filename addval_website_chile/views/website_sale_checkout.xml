@@ -49,7 +49,7 @@
     </template>
 
     <record id="chile_shipping_delete_flag" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
     <template id="chile_shipping_delete_button"
@@ -72,6 +72,6 @@
     </template>
 
     <record id="chile_shipping_delete_button" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 </odoo>

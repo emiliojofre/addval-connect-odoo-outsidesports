@@ -21,7 +21,7 @@
     </template>
 
     <record id="product_page_price_override" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
     <!-- Corrección de precios en listados de productos: mostrar solo un precio -->
@@ -50,7 +50,7 @@
     </template>
 
     <record id="products_list_price_override" model="ir.ui.view">
-        <field name="website_id" search="[('name','=','OUTSIDE SPORTS B2C')]" model="website"/>
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
     </record>
 
 </odoo>
