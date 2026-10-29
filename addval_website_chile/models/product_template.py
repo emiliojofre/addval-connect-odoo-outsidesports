@@ -28,6 +28,11 @@ class ProductTemplate(models.Model):
             # Cualquier otro sitio (ej. B2B) sigue exactamente igual que hoy.
             return res
 
+        # La plantilla de la ficha (website_sale.product) llama a este metodo
+        # SIN product_id en el render inicial; solo el JS (change_combination)
+        # lo pasa. Sin este fallback, el HTML del servidor y el JSON-LD quedaban
+        # con el precio neto. res['product_id'] es la variante ya resuelta.
+        product_id = product_id or res.get('product_id')
         product = self.env['product.product'].browse(product_id) if product_id else False
         if not product or not product.exists():
             return res
