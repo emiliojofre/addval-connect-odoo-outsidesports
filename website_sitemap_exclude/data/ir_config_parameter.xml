@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate: si se edita el parámetro en Ajustes > Técnico, no se pisa al actualizar -->
+    <data noupdate="1">
+        <record id="param_sitemap_excluded_prefixes" model="ir.config_parameter">
+            <field name="key">website_sitemap_exclude.prefixes</field>
+            <field name="value">/payment/,/credit,/add/credit/,/website/info,/event</field>
+        </record>
+    </data>
+</odoo>
