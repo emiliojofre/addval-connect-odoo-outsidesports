@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate: si se edita el parámetro en Ajustes > Técnico, no se pisa al actualizar -->
+    <data noupdate="1">
+        <record id="param_feed_website_ids" model="ir.config_parameter">
+            <field name="key">website_meta_catalog_feed.website_ids</field>
+            <field name="value">3</field>
+        </record>
+    </data>
+</odoo>
