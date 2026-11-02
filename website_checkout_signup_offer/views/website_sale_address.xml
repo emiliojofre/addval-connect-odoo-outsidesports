@@ -18,6 +18,9 @@
                 </div>
             </div>
         </xpath>
+        <xpath expr="//t[@t-if=&quot;mode == ('new', 'billing')&quot;]/h2" position="attributes">
+            <attribute name="t-if">not (is_public_user and account_on_checkout == 'optional')</attribute>
+        </xpath>
     </template>
 
     <record id="address_signup_offer" model="ir.ui.view">
