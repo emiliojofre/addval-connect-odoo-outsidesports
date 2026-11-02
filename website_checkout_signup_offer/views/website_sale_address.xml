@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="address_signup_offer"
+              inherit_id="website_sale.address"
+              name="Checkout B2C - Oferta de crear cuenta">
+        <xpath expr="//t[@t-if=&quot;mode == ('new', 'billing')&quot;]/h2" position="before">
+            <div t-if="is_public_user and account_on_checkout == 'optional'"
+                 id="checkout_signup_offer"
+                 class="alert alert-info d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-3"
+                 role="status">
+                <div>
+                    <strong>¿Quieres crear una cuenta?</strong><br/>
+                    Regístrate para seguir tus pedidos. Si prefieres, completa el formulario y compra como invitado.
+                </div>
+                <div class="d-flex flex-shrink-0 gap-2">
+                    <a role="button" href="/web/signup?redirect=/shop/checkout" class="btn btn-primary">Crear cuenta</a>
+                    <a role="button" href="/web/login?redirect=/shop/checkout" class="btn btn-secondary">Ya tengo cuenta</a>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <record id="address_signup_offer" model="ir.ui.view">
+        <field name="website_id" search="[('id','=',3)]" model="website"/>
+    </record>
+</odoo>
