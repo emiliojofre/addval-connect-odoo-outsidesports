@@ -13,11 +13,11 @@
     "website": "http://www.addval.cl",
     "category": "Partner",
     "license": "Other proprietary",
-    'version': '0.1',
+    'version': '19.0.1.0.0',
     
     'data': [
         'data/res_city.xml',
-        'views/res_partner.xml',
+        'data/res_country.xml',
     ],
     
     'depends': [

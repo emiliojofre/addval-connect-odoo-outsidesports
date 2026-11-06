@@ -1,46 +1,37 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Addval Website Chile - RUT, Teléfono y Precio IVA Incluido',
-    'version': '16.0.7.9.0',
+    'version': '19.0.1.0.0',
     'author': 'NLH Consultores SpA',
     'license': 'OPL-1',
     'category': 'Website/eCommerce',
     'summary': (
-        'Validación de RUT chileno y teléfono en el checkout, y precio '
-        'B2C con IVA incluido (solo tarifa final) en el sitio '
-        'OUTSIDE SPORTS B2C, sin afectar otros sitios (ej. B2B).'
+        'Checkout B2C de Chile: RUT obligatorio y validado, teléfono +56, '
+        'registro de clientes y precio con IVA incluido solo en el sitio B2C.'
     ),
+    'description': """
+Port a Odoo 19 (Outside Sports):
+- El precio con IVA incluido del B2C es ahora el ajuste estándar por sitio
+  "Visualización de impuestos" (website.show_line_subtotals_tax_selection);
+  el post-migrate lo deja en "IVA incluido" para el sitio 3 y "sin IVA" en
+  los demás. Se eliminan los overrides de precios y el JS/CSS que los parcheaba.
+- La comuna la aporta addval_website_address en el formulario estándar.
+- Las tarjetas de dirección de 19 ya permiten archivar direcciones: se quita
+  el botón y la ruta propios.
+- Ya no depende de internal_credit_payment (solo se declaraba para forzar
+  el orden de los controladores de 16).
+""",
     'depends': [
         'addval_website_address',
         'website_sale',
         'eq_website_default_code',
         'auth_signup',
-        # Necesario NO por funcionalidad, sino para el orden de carga:
-        # internal_credit_payment.WebsiteCreditPayment reimplementa
-        # checkout_form_validate/_validate_address_values desde cero SIN
-        # llamar a super(), cortando la cadena de herencia. Declararlo
-        # como dependencia obliga a Odoo a cargar nuestro controlador
-        # DESPUES (y por lo tanto ejecutarlo PRIMERO en la cadena de
-        # override), para que nuestras correcciones (telefono, RUT,
-        # comuna->city) se apliquen antes de que el metodo de ese modulo
-        # corte la cadena. Confirmado via logs: sin esto, nuestro
-        # checkout_form_validate nunca se ejecutaba.
-        'internal_credit_payment',
     ],
     'data': [
         'views/website_sale_address.xml',
-        'views/website_layout_chile.xml',
         'views/website_sale_product.xml',
-        'views/website_sale_checkout.xml',
         'views/website_auth_signup.xml',
     ],
-    'assets': {
-        'web.assets_frontend': [
-            'addval_website_chile/static/src/css/price_fix.css',
-            'addval_website_chile/static/src/js/checkout_chile.js',
-            'addval_website_chile/static/src/js/product_price_fix.js',
-        ],
-    },
     'installable': True,
     'auto_install': False,
 }

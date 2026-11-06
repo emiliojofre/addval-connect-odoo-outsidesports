@@ -1,20 +1,4 @@
 # -*- encoding: utf-8 -*-
-from odoo import fields, models, api
-from odoo.tools.translate import _
-
-
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
-
-    @api.depends('city_id')
-    def _give_city_name(self):
-        for record in self:
-            if record.city_id:
-                record.zip = self.city_id.zipcode
-                record.state_id = self.city_id.state_id
-                record.city = self.city_id.name
-            else:
-                record.zip = False
-                record.state_id = False
-                record.city = ""
-
+# Port 19: el compute _give_city_name no lo usaba ningún campo; el relleno de
+# ciudad/código postal/región desde la comuna lo hace base_address_extended
+# (onchange de city_id).

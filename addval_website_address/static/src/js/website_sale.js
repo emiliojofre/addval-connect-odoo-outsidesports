@@ -1,116 +1,96 @@
 /** @odoo-module **/
-import { WebsiteSale } from 'website_sale.website_sale';
+// Port a Odoo 19 (Outside Sports): selector de comuna para Chile en el
+// formulario de dirección estándar (checkout y Mi cuenta).
+// - Filtra las comunas por la región elegida.
+// - Copia el nombre de la comuna al campo oculto "city" (obligatorio en Odoo).
+// - Si el país no es Chile, muestra el campo de texto de ciudad y desactiva el
+//   selector (un <select> desactivado no se envía).
 
-WebsiteSale.include({
-    template: "addval_website_address.address_custom",
-    events: Object.assign(WebsiteSale.prototype.events, {
-        'change select[name="state_id"]': '_onChangeState',
-    }),
+function setupWrapper(wrapper) {
+    const form = wrapper.closest('form');
+    if (!form || wrapper.dataset.clReady) {
+        return;
+    }
+    wrapper.dataset.clReady = '1';
+    const select = wrapper.querySelector('.o_cl_city_select');
+    const input = wrapper.querySelector('.o_cl_city_input');
+    const labelComuna = wrapper.querySelector('.o_cl_city_label_comuna');
+    const labelCity = wrapper.querySelector('.o_cl_city_label_city');
+    const chileId = wrapper.dataset.clCountryId;
+    const countrySelect = form.querySelector('select[name="country_id"]');
+    const stateSelect = form.querySelector('select[name="state_id"]');
+    const zipInput = form.querySelector('input[name="zip"]');
 
-    /**
-    * @private
-    */
-    _noSelector: function () {
-    },
-    /**
-    * @private
-    */
-    _changeState: function () {
-        let country_id = $("#country_id").val();
-        let state_id = $("#state_id").val();
-        if (country_id === undefined || country_id === null || country_id === "") {
-            var selector = $("select[name='city_id']");
-            //var input = $("input[name='city']");
-            selector.get(0).setAttribute('style', 'display:none');
-            selector.get(0).setAttribute('disabled', 'disabled');
-            //input.get(0).setAttribute('style', 'display:block');
-            //input.get(0).removeAttribute('disabled');
-            return;
-        }
-        if (state_id === undefined || state_id === null || state_id === "") {
-            var selector = $("select[name='city_id']");
-            //var input = $("input[name='city']");
-            selector.get(0).setAttribute('style', 'display:none');
-            selector.get(0).setAttribute('disabled', 'disabled');
-            //input.get(0).setAttribute('style', 'display:block');
-            //input.get(0).removeAttribute('disabled');
-            return;
-        }
-        this._rpc({
-            route: "/shop/state_infos/" + country_id + "/" + state_id,
-        }).then(function (data) {
-            if (!data.in_country) {
-                var selector = $("select[name='city_id']");
-                //var input = $("input[name='city']");
-                selector.get(0).setAttribute('style', 'display:none');
-                selector.get(0).setAttribute('disabled', 'disabled');
-                //input.get(0).setAttribute('style', 'display:block');
-                //input.get(0).removeAttribute('disabled');
-                return;
+    const isChile = () => countrySelect && chileId && countrySelect.value === chileId;
+
+    const filterByState = () => {
+        const stateId = stateSelect ? stateSelect.value : '';
+        for (const option of select.options) {
+            if (!option.value) {
+                continue;
             }
-            var selector = $("select[name='city_id']");
-            //var input = $("input[name='city']");
-            if (!data.use_selector) {
-                selector.get(0).setAttribute('style', 'display:none');
-                selector.get(0).setAttribute('disabled', 'disabled');
-                //input.get(0).setAttribute('style', 'display:block');
-                //input.get(0).removeAttribute('disabled');
-                return;
+            const visible = !stateId || option.dataset.stateId === stateId;
+            option.hidden = !visible;
+            option.disabled = !visible;
+        }
+        const current = select.selectedOptions[0];
+        if (current && current.value && current.disabled) {
+            select.value = '';
+        }
+    };
+
+    const syncCity = () => {
+        const current = select.selectedOptions[0];
+        if (current && current.value) {
+            input.value = current.textContent.trim();
+            if (zipInput && !zipInput.value && current.dataset.zip) {
+                zipInput.value = current.dataset.zip;
             }
-            // populate cities and display
-            var selectCities = $("select[name='city_id']");
-            selectCities.html('');
-            _.each(data.cities, function (x) {
-                var opt = $('<option>').text(x.name)
-                    .attr('value', x.id);
-                selectCities.append(opt);
-            });
-            //input.get(0).setAttribute('style', 'display:none');
-            //input.get(0).setAttribute('disabled', 'disabled');
-            selector.get(0).setAttribute('style', 'display:block');
-            selector.get(0).removeAttribute('disabled');
-        }).catch((error) => {
-            console.log(error);
+            if (stateSelect && !stateSelect.value && current.dataset.stateId) {
+                stateSelect.value = current.dataset.stateId;
+            }
+        } else if (isChile()) {
+            input.value = '';
+        }
+    };
+
+    const applyCountry = () => {
+        const chile = isChile();
+        select.style.display = chile ? '' : 'none';
+        select.disabled = !chile;
+        input.style.display = chile ? 'none' : '';
+        if (labelComuna) {
+            labelComuna.style.display = chile ? '' : 'none';
+        }
+        if (labelCity) {
+            labelCity.style.display = chile ? 'none' : '';
+        }
+        if (chile) {
+            filterByState();
+            syncCity();
+        }
+    };
+
+    select.addEventListener('change', syncCity);
+    if (stateSelect) {
+        stateSelect.addEventListener('change', () => {
+            filterByState();
+            syncCity();
         });
-    },
-    /**
-     * @private
-     * @param {Event} ev
-     */
-    _onChangeState: function (ev) {
-        if (!this.$('.checkout_autoformat').length) {
-            return;
-        }
-        this._changeState();
-    },
-    /**
-     * @private
-     * @param {Event} ev
-     */
-    _onChangeCountry: function (ev) {
-        this._super.apply(this, arguments)
-        this._rpc({
-            route: "/shop/country_infos/" + 46, // Hard coded Chile
-            params: {
-                mode: $("#country_id").attr('mode'),
-            },
-        }).then(function (data) {
-            var selectStates = $("select[name='state_id']");
-            if (data.states.length || data.state_required) {
-                selectStates.html('');
-                _.each(data.states, function (x) {
-                    var opt = $('<option>').text(x[1])
-                        .attr('value', x[0])
-                        .attr('data-code', x[2]);
-                    selectStates.append(opt);
-                });
-                selectStates.parent('div').show();
-            } else {
-                selectStates.val('').parent('div').hide();
-            }
-        }).then(() => {
-            this._changeState()
-        });
+    }
+    if (countrySelect) {
+        // El JS estándar recarga regiones al cambiar de país; se espera a que termine.
+        countrySelect.addEventListener('change', () => setTimeout(applyCountry, 400));
+    }
+    applyCountry();
+}
 
-    },
-});
+function setupAll() {
+    document.querySelectorAll('.o_cl_city_wrapper').forEach(setupWrapper);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAll);
+} else {
+    setupAll();
+}
