@@ -3,51 +3,13 @@
     <!--
         Registro de clientes SOLO en el sitio B2C.
 
-        La vista genérica auth_signup.signup se editó desde el editor para
-        mostrar un mensaje ("De momento no permitimos registros...") en todos
-        los sitios. Para el B2C se mantiene una copia específica del sitio
-        (misma key, website_id = 3) con el formulario real. Port 19: el arch es
-        el de auth_signup.signup de 19, con los textos traducidos.
+        Port 19: en 16 se editó a mano la vista genérica auth_signup.signup
+        para mostrar un mensaje en todos los sitios y se creaba aquí una copia
+        con el formulario real solo para el B2C. El upgrade de Odoo restablece
+        esa vista genérica, así que ahora se usa el ajuste estándar por sitio
+        (website.auth_signup_uninvited): el post-migrate deja el B2C en
+        registro libre ('b2c') y los demás sitios por invitación ('b2b').
     -->
-    <record id="chile_signup_form_b2c" model="ir.ui.view">
-        <field name="name">Sign up login (Chile B2C - formulario real)</field>
-        <field name="type">qweb</field>
-        <field name="key">auth_signup.signup</field>
-        <field name="website_id" search="[('id','=',3)]" model="website"/>
-        <field name="arch" type="xml">
-            <t t-name="auth_signup.signup">
-                <t t-call="web.login_layout">
-                    <div class="oe_structure" id="oe_structure_signup_top"/>
-                    <form class="oe_signup_form" role="form" method="post" t-if="not message" data-captcha="signup">
-                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <div class="mb-3 field-name">
-                            <label for="name" class="form-label">Nombre</label>
-                            <input type="text" name="name" t-att-value="name" id="name" class="form-control"
-                                   autofocus="autofocus" required="required"/>
-                        </div>
-                        <div class="mb-3 field-login">
-                            <label for="login" class="form-label">Email</label>
-                            <input type="text" name="login" t-att-value="login" id="login" class="form-control"
-                                   t-att-autofocus="'autofocus' if login else None"
-                                   autocapitalize="off" required="required" placeholder="nombre@ejemplo.cl"/>
-                        </div>
-                        <t t-call="auth_signup.fields"/>
-                        <p class="alert alert-danger" t-if="error" role="alert">
-                            <t t-out="error"/>
-                        </p>
-                        <input type="hidden" name="redirect" t-att-value="redirect"/>
-                        <input type="hidden" name="token" t-att-value="token"/>
-                        <div class="text-center oe_login_buttons d-grid pt-3">
-                            <button type="submit" class="btn btn-primary mb-1">Registrarse</button>
-                            <a t-attf-href="/web/login?{{ keep_query() }}" class="btn btn-link btn-sm mt-2" role="button">¿Ya tienes una cuenta?</a>
-                            <t t-call="web.login_oauth"/>
-                        </div>
-                    </form>
-                    <div class="oe_structure" id="oe_structure_signup_bottom"/>
-                </t>
-            </t>
-        </field>
-    </record>
 
     <!-- Página de confirmación: "para seguir su pedido" -> "¿Desea registrarse?". -->
     <template id="chile_confirmation_signup_text"

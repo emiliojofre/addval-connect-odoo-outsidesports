@@ -3,8 +3,10 @@
     <!-- Port 19: en vez de la vista propia del contacto (attrs, xpaths de 16),
          se usa el soporte estándar de base_address_extended: con
          "enforce_cities" el formulario muestra la comuna (city_id) y
-         rellena ciudad, código postal y región. -->
-    <record id="base.cl" model="res.country">
-        <field name="enforce_cities" eval="True"/>
-    </record>
+         rellena ciudad, código postal y región.
+         base.cl es noupdate en base, por eso se escribe con <function>. -->
+    <function model="res.country" name="write">
+        <value eval="[ref('base.cl')]"/>
+        <value eval="{'enforce_cities': True}"/>
+    </function>
 </odoo>

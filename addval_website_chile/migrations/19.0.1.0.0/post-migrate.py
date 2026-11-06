@@ -36,7 +36,19 @@ def _set_tax_display(env):
             _logger.info("upgrade19 %s: sitio %s -> %s", MODULE, website.id, value)
 
 
+def _set_signup_scope(env):
+    """Registro libre solo en el B2C; en los demás sitios, por invitación.
+    En 16 se conseguía editando a mano auth_signup.signup (vista genérica),
+    pero el upgrade de Odoo restablece esa vista."""
+    for website in env['website'].search([]):
+        value = 'b2c' if website.id == B2C_WEBSITE_ID else 'b2b'
+        if website.auth_signup_uninvited != value:
+            website.auth_signup_uninvited = value
+            _logger.info("upgrade19 %s: registro sitio %s -> %s", MODULE, website.id, value)
+
+
 def migrate(cr, version):
     env = api.Environment(cr, SUPERUSER_ID, {'active_test': False})
     _drop_obsolete_views(env)
     _set_tax_display(env)
+    _set_signup_scope(env)
