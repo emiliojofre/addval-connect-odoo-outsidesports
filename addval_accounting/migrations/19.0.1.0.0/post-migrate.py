@@ -25,3 +25,24 @@ def migrate(cr, version):
         _logger.info("upgrade19 %s: borrando vistas obsoletas %s y copias %s", MODULE, keys, cows.ids)
         (cows | views).with_context(no_cow=True, _force_unlink=True).unlink()
     obsolete.exists().unlink()
+
+    _deactivate_views_of_missing_modules(env)
+
+
+def _deactivate_views_of_missing_modules(env):
+    """Módulos que siguen "instalados" en la base pero cuyo código 19 no está
+    (hoy addval_bank_sync / Fintoc, que actualiza su proveedor): sus vistas
+    heredadas siguen activas y usan campos que no existen, y el navegador
+    falla al abrir Contabilidad (tablero de diarios). Se desactivan; si el
+    módulo llega con versión 19 su código está disponible y no se tocan."""
+    from odoo.modules.module import get_manifest
+
+    modules = env['ir.module.module'].search([('state', 'in', ('installed', 'to upgrade'))])
+    missing = [m.name for m in modules if not get_manifest(m.name).get('installable')]
+    if not missing:
+        return
+    imds = env['ir.model.data'].search([('module', 'in', missing), ('model', '=', 'ir.ui.view')])
+    views = env['ir.ui.view'].browse(imds.mapped('res_id')).exists().filtered('active')
+    if views:
+        views.with_context(no_cow=True).write({'active': False})
+    _logger.info("upgrade19: módulos sin código %s, vistas desactivadas %s", missing, views.ids)
