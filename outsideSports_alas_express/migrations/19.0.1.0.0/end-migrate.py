@@ -1,8 +1,9 @@
-# Upgrade 16 -> 19 (Outside Sports): repite la reactivación de los métodos
-# Alas Express publicados al FINAL de la actualización (después de cargar todos
-# los módulos). En el build de Odoo.sh del 06-11 el post-migrate los reactivó
-# pero quedaron archivados de nuevo durante la misma carga, y el B2C se quedó
-# sin métodos de envío.
+# Upgrade 16 -> 19 (Outside Sports): red de seguridad que repite al FINAL de
+# la actualización la reactivación de los métodos Alas Express publicados.
+# OJO: en las bases de PRUEBA de Odoo.sh quedan archivados igualmente porque la
+# neutralización (delivery/data/neutralize.sql) archiva todos los métodos de
+# proveedores externos después de actualizar; en producción no hay
+# neutralización. Para probar en una base de prueba, reactivarlos a mano.
 import logging
 
 from odoo import api, SUPERUSER_ID
