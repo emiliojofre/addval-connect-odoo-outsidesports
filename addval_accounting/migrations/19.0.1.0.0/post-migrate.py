@@ -41,8 +41,25 @@ def _deactivate_views_of_missing_modules(env):
     missing = [m.name for m in modules if not get_manifest(m.name).get('installable')]
     if not missing:
         return
-    imds = env['ir.model.data'].search([('module', 'in', missing), ('model', '=', 'ir.ui.view')])
-    views = env['ir.ui.view'].browse(imds.mapped('res_id')).exists().filtered('active')
-    if views:
-        views.with_context(no_cow=True).write({'active': False})
-    _logger.info("upgrade19: módulos sin código %s, vistas desactivadas %s", missing, views.ids)
+    # SQL directo: con el ORM, write() valida cada vista y las de modelos que
+    # ya no existen (p. ej. fintoc.event) hacen fallar toda la actualización.
+    env.cr.execute("""
+        UPDATE ir_ui_view v SET active = FALSE
+          FROM ir_model_data d
+         WHERE d.model = 'ir.ui.view' AND d.res_id = v.id
+           AND d.module IN %s AND v.active
+     RETURNING v.id
+    """, [tuple(missing)])
+    ids = [r[0] for r in env.cr.fetchall()]
+    env.cr.execute("""
+        UPDATE ir_ui_menu m SET active = FALSE
+          FROM ir_model_data d
+         WHERE d.model = 'ir.ui.menu' AND d.res_id = m.id
+           AND d.module IN %s AND m.active
+     RETURNING m.id
+    """, [tuple(missing)])
+    menu_ids = [r[0] for r in env.cr.fetchall()]
+    env['ir.ui.view'].invalidate_model(['active'])
+    env['ir.ui.menu'].invalidate_model(['active'])
+    _logger.info("upgrade19: módulos sin código %s, vistas desactivadas %s, menús %s",
+                 missing, ids, menu_ids)
