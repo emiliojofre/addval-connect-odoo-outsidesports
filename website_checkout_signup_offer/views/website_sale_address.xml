@@ -3,8 +3,10 @@
     <template id="address_signup_offer"
               inherit_id="website_sale.address"
               name="Checkout B2C - Oferta de crear cuenta">
-        <xpath expr="//t[@t-if=&quot;mode == ('new', 'billing')&quot;]/h2" position="before">
-            <div t-if="is_public_user and account_on_checkout == 'optional'"
+        <!-- Port 19: el aviso estándar "¿Ya tienes cuenta?" va dentro del formulario
+             (t is_anonymous_cart); con cuenta opcional se sustituye por la oferta. -->
+        <xpath expr="//form[@name='address_form']/t[@t-if='is_anonymous_cart']" position="before">
+            <div t-if="is_anonymous_cart and website.account_on_checkout == 'optional'"
                  id="checkout_signup_offer"
                  class="alert alert-info d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-3"
                  role="status">
@@ -18,8 +20,8 @@
                 </div>
             </div>
         </xpath>
-        <xpath expr="//t[@t-if=&quot;mode == ('new', 'billing')&quot;]/h2" position="attributes">
-            <attribute name="t-if">not (is_public_user and account_on_checkout == 'optional')</attribute>
+        <xpath expr="//form[@name='address_form']/t[@t-if='is_anonymous_cart']" position="attributes">
+            <attribute name="t-if">is_anonymous_cart and website.account_on_checkout != 'optional'</attribute>
         </xpath>
     </template>
 

@@ -5,6 +5,7 @@ import time
 from lxml import etree
 
 from odoo import http
+from odoo.fields import Domain
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -55,8 +56,8 @@ class MetaCatalogFeed(http.Controller):
         pricelist = website.pricelist_id
         currency = pricelist.currency_id or website.currency_id
 
-        templates = env['product.template'].search(
-            website.sale_product_domain() + [('is_published', '=', True)])
+        templates = env['product.template'].search(Domain.AND([
+            website.sale_product_domain(), [('is_published', '=', True)]]))
 
         rss = etree.Element('rss', version='2.0', nsmap={'g': G_NS})
         channel = etree.SubElement(rss, 'channel')
@@ -81,8 +82,8 @@ class MetaCatalogFeed(http.Controller):
     def _feed_item(self, template, variant, website, pricelist, currency, base_url):
         # Con website_id=3 en el contexto, addval_website_chile devuelve los
         # precios con IVA incluido, igual que la ficha del B2C.
-        info = template._get_combination_info(
-            product_id=variant.id, pricelist=pricelist)
+        # En 19 la tarifa sale del sitio/contexto (ya no se pasa pricelist).
+        info = template._get_combination_info(product_id=variant.id)
         price = info.get('price') or 0.0
         list_price = info.get('list_price') or price
         if price <= 0:
@@ -91,7 +92,7 @@ class MetaCatalogFeed(http.Controller):
 
         # Misma regla de disponibilidad que el JSON-LD de la ficha (vista 5811).
         stock_variant = variant.sudo()
-        if stock_variant.detailed_type != 'product' or stock_variant.free_qty > 0:
+        if not stock_variant.is_storable or stock_variant.free_qty > 0:
             availability = 'in stock'
         elif template.allow_out_of_stock_order:
             availability = 'available for order'

@@ -10,7 +10,7 @@ Commerce Manager lo lee como "feed de datos programado". Solo responde en los
 sitios cuyo id está en el parámetro website_meta_catalog_feed.website_ids
 (por defecto el B2C, id 3), para no exponer la tarifa de distribuidores.
 """,
-    'version': '16.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Website/eCommerce',
     'author': 'Outside Sports',
     'license': 'LGPL-3',
