@@ -38,7 +38,12 @@ def _deactivate_views_of_missing_modules(env):
     from odoo.modules.module import get_manifest
 
     modules = env['ir.module.module'].search([('state', 'in', ('installed', 'to upgrade'))])
-    missing = [m.name for m in modules if not get_manifest(m.name).get('installable')]
+    # studio_customization no tiene código por diseño: guarda en la base las
+    # personalizaciones de Studio. Sus vistas NO se deben tocar.
+    missing = [
+        m.name for m in modules
+        if m.name != 'studio_customization' and not get_manifest(m.name).get('installable')
+    ]
     if not missing:
         return
     # SQL directo: con el ORM, write() valida cada vista y las de modelos que
