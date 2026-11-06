@@ -11,7 +11,7 @@
             <xpath expr="//page[@name='destination']" position="before">
                 <page name="alas_express_config"
                       string="Alas Express"
-                      attrs="{'invisible': [('delivery_type', '!=', 'alas_express')]}">
+                      invisible="delivery_type != 'alas_express'">
 
                     <group string="Credenciales API">
                         <group>
@@ -58,17 +58,17 @@
                                     type="object"
                                     string="Cargar regiones de Chile"
                                     class="btn-secondary"
-                                    attrs="{'invisible': [('id', '=', False)]}"/>
+                                    invisible="not id"/>
                         </group>
                     </group>
                     <field name="alas_region_rate_ids"
                            nolabel="1"
-                           attrs="{'invisible': [('id', '=', False)]}">
-                        <tree editable="bottom">
+                           invisible="not id">
+                        <list editable="bottom">
                             <field name="state_id"/>
                             <field name="price"/>
                             <field name="currency_id" optional="hide"/>
-                        </tree>
+                        </list>
                     </field>
 
                     <group string="Información de la API">
@@ -93,12 +93,12 @@
         <field name="name">alas.express.region.rate.tree</field>
         <field name="model">alas.express.region.rate</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="carrier_id" optional="hide"/>
                 <field name="state_id"/>
                 <field name="price"/>
                 <field name="currency_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 

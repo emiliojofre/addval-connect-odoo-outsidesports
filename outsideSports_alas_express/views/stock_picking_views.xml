@@ -11,7 +11,7 @@
         <field name="arch" type="xml">
 
             <!-- Campo auxiliar invisible para condiciones de visibilidad -->
-            <xpath expr="//field[@name='is_locked']" position="after">
+            <xpath expr="//header" position="inside">
                 <field name="alas_is_carrier" invisible="1"/>
             </xpath>
 
@@ -23,13 +23,7 @@
                         string="🚀 Enviar a Alas Express"
                         type="object"
                         class="btn-primary"
-                        attrs="{
-                            'invisible': [
-                                '|',
-                                ('alas_is_carrier', '=', False),
-                                ('alas_delivery_order_id', '!=', False)
-                            ]
-                        }"
+                        invisible="not alas_is_carrier or alas_delivery_order_id"
                         confirm="¿Confirmar la creación de la orden de entrega en Alas Express?"/>
 
                 <!-- Actualizar Estado -->
@@ -37,54 +31,28 @@
                         string="🔄 Estado Alas"
                         type="object"
                         class="btn-secondary"
-                        attrs="{
-                            'invisible': [
-                                '|',
-                                ('alas_is_carrier', '=', False),
-                                ('alas_delivery_order_id', '=', False)
-                            ]
-                        }"/>
+                        invisible="not alas_is_carrier or not alas_delivery_order_id"/>
 
                 <!-- Obtener Etiqueta PDF -->
                 <button name="action_alas_get_label"
                         string="🏷️ Etiqueta PDF"
                         type="object"
                         class="btn-secondary"
-                        attrs="{
-                            'invisible': [
-                                '|',
-                                ('alas_is_carrier', '=', False),
-                                ('alas_delivery_order_id', '=', False)
-                            ]
-                        }"/>
+                        invisible="not alas_is_carrier or not alas_delivery_order_id"/>
 
                 <!-- Obtener Etiqueta ZPL -->
                 <button name="action_alas_get_label_zpl"
                         string="🖨️ Etiqueta ZPL"
                         type="object"
                         class="btn-secondary"
-                        attrs="{
-                            'invisible': [
-                                '|',
-                                ('alas_is_carrier', '=', False),
-                                ('alas_delivery_order_id', '=', False)
-                            ]
-                        }"/>
+                        invisible="not alas_is_carrier or not alas_delivery_order_id"/>
 
                 <!-- Rechazar Orden -->
                 <button name="action_alas_reject_order"
                         string="✖ Rechazar en Alas"
                         type="object"
                         class="btn-danger"
-                        attrs="{
-                            'invisible': [
-                                '|',
-                                '|',
-                                ('alas_is_carrier', '=', False),
-                                ('alas_delivery_order_id', '=', False),
-                                ('alas_status', 'in', ['Entregado','Rechazado Agendamiento','Rechazado Terreno','No Entregable','Rechazada B2B'])
-                            ]
-                        }"
+                        invisible="not alas_is_carrier or not alas_delivery_order_id or alas_status in ['Entregado','Rechazado Agendamiento','Rechazado Terreno','No Entregable','Rechazada B2B']"
                         confirm="¿Confirmar el rechazo de la orden en Alas Express? Esta acción puede ser irreversible."/>
 
             </xpath>
@@ -93,13 +61,13 @@
             <xpath expr="//page[@name='extra']" position="before">
                 <page name="alas_express_info"
                       string="Alas Express"
-                      attrs="{'invisible': [('alas_is_carrier', '=', False)]}">
+                      invisible="not alas_is_carrier">
 
                     <!-- Semáforo de estado — muestra el estado REAL del picking
                          (alas_status) más su descripción calculada dinámicamente
                          (alas_status_description), no un texto fijo. -->
                     <div class="row mb-3"
-                         attrs="{'invisible': [('alas_delivery_order_id', '=', False)]}">
+                         invisible="not alas_delivery_order_id">
                         <div class="col-12">
                             <div class="alert alert-info" role="alert">
                                 <strong>Estado actual: </strong>
@@ -123,7 +91,7 @@
                     </group>
 
                     <!-- Botón para abrir etiqueta adjunta -->
-                    <group attrs="{'invisible': [('alas_delivery_order_id', '=', False)]}">
+                    <group invisible="not alas_delivery_order_id">
                         <div>
                             <button name="action_alas_open_label_attachment"
                                     string="📄 Descargar Etiqueta PDF"

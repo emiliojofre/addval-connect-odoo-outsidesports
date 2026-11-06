@@ -52,13 +52,10 @@ class AlasExpressRegionRate(models.Model):
         readonly=True,
     )
 
-    _sql_constraints = [
-        (
-            'carrier_state_uniq',
-            'unique(carrier_id, state_id)',
-            'Ya existe una tarifa para esta región en el método de envío.',
-        ),
-    ]
+    _carrier_state_uniq = models.Constraint(
+        'unique(carrier_id, state_id)',
+        'Ya existe una tarifa para esta región en el método de envío.',
+    )
 
     @api.constrains('price')
     def _check_price(self):
@@ -68,12 +65,7 @@ class AlasExpressRegionRate(models.Model):
                     'El precio de envío para la región "%s" no puede ser negativo.'
                 ) % (rec.state_id.display_name or ''))
 
-    def name_get(self):
-        result = []
+    @api.depends('state_id', 'price')
+    def _compute_display_name(self):
         for rec in self:
-            name = '%s: %s' % (
-                rec.state_id.name or _('Sin región'),
-                rec.price,
-            )
-            result.append((rec.id, name))
-        return result
+            rec.display_name = '%s: %s' % (rec.state_id.name or _('Sin región'), rec.price)

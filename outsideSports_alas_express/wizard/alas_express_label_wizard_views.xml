@@ -18,18 +18,18 @@
 
                     <group string="Albaranes seleccionados">
                         <field name="picking_ids" nolabel="1">
-                            <tree>
+                            <list>
                                 <field name="name"/>
                                 <field name="partner_id"/>
                                 <field name="alas_delivery_order_id"/>
                                 <field name="alas_status"/>
                                 <field name="state"/>
-                            </tree>
+                            </list>
                         </field>
                     </group>
 
                     <group string="Resultado"
-                           attrs="{'invisible': [('result_log', '=', False)]}">
+                           invisible="not result_log">
                         <field name="result_log" nolabel="1" readonly="1"
                                widget="text" style="font-family: monospace; font-size: 12px;"/>
                     </group>

@@ -190,7 +190,7 @@ class ProviderAlasExpress(models.Model):
             raise UserError(_('El destinatario "%s" no tiene ciudad/comuna configurada.') % partner.name)
 
         # Teléfono móvil: limpiar y validar 9 dígitos
-        mobile = (partner.mobile or partner.phone or '').replace(' ', '').replace('+56', '').replace('-', '')
+        mobile = (getattr(partner, 'mobile', False) or partner.phone or '').replace(' ', '').replace('+56', '').replace('-', '')
         if not mobile:
             raise UserError(_('El destinatario "%s" no tiene teléfono configurado.') % partner.name)
         # Tomar solo los últimos 9 dígitos
@@ -262,19 +262,24 @@ class ProviderAlasExpress(models.Model):
         Retorna los nombres de los paquetes asignados al picking.
         Lanza error si no hay paquetes o si hay más de 3.
         """
-        if not picking.package_ids:
+        # Port 19: el albarán ya no tiene package_ids (stock.quant.package pasó a
+        # stock.package); los paquetes salen de las líneas de movimiento.
+        packages = picking._get_packages_for_print()
+        if not packages:
             raise UserError(_(
-                'El albarán "%s" no tiene paquetes asignados.\n'
+                'El albarán "%s" no tiene paquetes asignados.
+'
                 'Debe asignar los paquetes en la pestaña "Operaciones detalladas" '
                 'antes de enviar a Alas Express.'
             ) % picking.name)
-        if len(picking.package_ids) > 3:
+        if len(packages) > 3:
             raise UserError(_(
                 'El albarán "%s" tiene %d paquetes asignados. '
-                'Alas Express acepta un máximo de 3 paquetes por orden.\n'
+                'Alas Express acepta un máximo de 3 paquetes por orden.
+'
                 'Divida el envío en múltiples albaranes.'
-            ) % (picking.name, len(picking.package_ids)))
-        return [pkg.name for pkg in picking.package_ids]
+            ) % (picking.name, len(packages)))
+        return [pkg.name for pkg in packages]
 
     # ── Métodos públicos de la API ───────────────────────────────────────────
 
