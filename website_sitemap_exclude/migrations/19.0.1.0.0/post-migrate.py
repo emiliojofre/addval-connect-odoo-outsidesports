@@ -2,6 +2,9 @@
 # Son vistas creadas directamente en la base (sin módulo ni xmlid), así que
 # ningún módulo las actualiza; se reescriben aquí con las estructuras de 19.
 import logging
+import re
+
+from psycopg2.extras import Json
 
 from odoo import api, SUPERUSER_ID
 
@@ -45,7 +48,39 @@ JSONLD_REPLACE = (
 DEACTIVATE = ['outside_seo.product_listing_price_label']
 
 
+INPUT_TAG = re.compile(r'<input\b[^>]*>')
+ORDER_BY = re.compile(r'\bdata-order-by="([^"]*)"')
+ORDER_INPUT = '<input name="order" type="hidden" class="o_search_order_by oe_unremovable" value="%s"/>'
+
+
+def _fix_searchbar_order(cr):
+    """Buscadores guardados con el editor web en 16 (p. ej. la copia por sitio
+    de website.header_call_to_action) no tienen el campo oculto
+    `o_search_order_by` que exige el JS de 19: la interacción SearchBar falla
+    al arrancar y deja la página sin interactividad ("Agregar al carrito" no
+    hace nada). Se añade el campo con el orden que ya traía el input."""
+    def add_order(match):
+        tag = match.group(0)
+        if 'search-query' not in tag:
+            return tag
+        order = ORDER_BY.search(tag)
+        return tag + ORDER_INPUT % (order.group(1) if order else 'name asc')
+
+    cr.execute("""
+        SELECT id, arch_db FROM ir_ui_view
+         WHERE arch_db::text LIKE '%%s_searchbar_input%%'
+           AND arch_db::text NOT LIKE '%%o_search_order_by%%'
+           AND arch_db::text LIKE '%%search-query%%'
+    """)
+    for view_id, arch in cr.fetchall():
+        new = {lang: INPUT_TAG.sub(add_order, value) for lang, value in arch.items()}
+        if new != arch:
+            cr.execute("UPDATE ir_ui_view SET arch_db = %s WHERE id = %s", [Json(new), view_id])
+            _logger.info("upgrade19: buscador con o_search_order_by en la vista %s", view_id)
+
+
 def migrate(cr, version):
+    _fix_searchbar_order(cr)
     env = api.Environment(cr, SUPERUSER_ID, {'active_test': False})
     View = env['ir.ui.view'].with_context(no_cow=True)
 

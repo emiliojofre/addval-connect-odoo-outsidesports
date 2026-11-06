@@ -32,6 +32,11 @@ reescritura de account.move._compute_amount.
         'views/partner_credit_views.xml',
         'views/res_partner_views.xml',
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'internal_credit_payment/static/src/interactions/post_processing.js',
+        ],
+    },
     'installable': True,
     'application': False,
 }
