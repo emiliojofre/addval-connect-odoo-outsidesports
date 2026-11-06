@@ -17,7 +17,7 @@
   "name"                 :  "Website Product Brand",
   "summary"              :  """The module filter the products according to various brands on your Odoo website. The user can create various brand records and add products to them.""",
   "category"             :  "Website",
-  "version"              :  "1.0.3",
+  "version"              :  "19.0.1.0.0",
   "sequence"             :  1,
   "author"               :  "Webkul Software Pvt. Ltd.",
   "license"              :  "Other proprietary",
@@ -42,10 +42,9 @@ Odoo website product filters.""",
   "installable"          :  True,
   'assets': {
         'web.assets_frontend': [
-            'website_product_brands/static/src/**/*',
+            'website_product_brands/static/src/css/website_product_brands.css',
         ],
     },
   "price"                :  35,
   "currency"             :  "USD",
-  "pre_init_hook"        :  "pre_init_check",
 }
