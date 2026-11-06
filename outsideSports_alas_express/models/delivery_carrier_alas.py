@@ -267,16 +267,14 @@ class ProviderAlasExpress(models.Model):
         packages = picking._get_packages_for_print()
         if not packages:
             raise UserError(_(
-                'El albarán "%s" no tiene paquetes asignados.
-'
+                'El albarán "%s" no tiene paquetes asignados.\n'
                 'Debe asignar los paquetes en la pestaña "Operaciones detalladas" '
                 'antes de enviar a Alas Express.'
             ) % picking.name)
         if len(packages) > 3:
             raise UserError(_(
                 'El albarán "%s" tiene %d paquetes asignados. '
-                'Alas Express acepta un máximo de 3 paquetes por orden.
-'
+                'Alas Express acepta un máximo de 3 paquetes por orden.\n'
                 'Divida el envío en múltiples albaranes.'
             ) % (picking.name, len(packages)))
         return [pkg.name for pkg in packages]
