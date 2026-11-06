@@ -110,4 +110,13 @@ class CustomerPortalChileB2C(ChileB2CAddressMixin, CustomerPortal):
 
 
 class WebsiteSaleChileB2C(ChileB2CAddressMixin, WebsiteSale):
-    pass
+
+    def _prepare_address_form_values(self, *args, **kwargs):
+        """En el B2C el RUT es obligatorio en la facturación: el bloque de
+        campos de empresa (donde está el RUT) se muestra siempre, sin depender
+        de la opción "campos B2B" del sitio (website_sale.address_b2b), que
+        el upgrade puede dejar desactivada."""
+        values = super()._prepare_address_form_values(*args, **kwargs)
+        if _is_b2c() and 'website_sale_order' in values:
+            values['display_b2b_fields'] = True
+        return values
