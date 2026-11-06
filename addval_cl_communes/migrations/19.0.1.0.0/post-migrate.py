@@ -20,7 +20,8 @@ def migrate(cr, version):
     views = View.browse(obsolete.mapped('res_id')).exists()
     if views:
         keys = views.mapped('key')
-        cows = View.search([('key', 'in', keys), ('website_id', '!=', False)])
+        # Este módulo se carga antes que website: puede no existir website_id.
+        cows = View.search([('key', 'in', keys), ('website_id', '!=', False)])             if 'website_id' in View._fields else View
         _logger.info("upgrade19 %s: borrando vistas obsoletas %s y copias %s", MODULE, keys, cows.ids)
         (cows | views).with_context(no_cow=True, _force_unlink=True).unlink()
     obsolete.exists().unlink()
