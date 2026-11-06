@@ -17,7 +17,7 @@
     "name"              :  "Website Base Filters and Attributes",
     "summary"           :  "This module provides a common form for all filters and attributes inside product grid view.",
     "category"          :  "Website",
-    "version"           :  "1.0.0",
+    "version"           :  "19.0.1.0.0",
     "sequence"          :  1,
     "author"            :  "Webkul Software Pvt. Ltd.",
     "license"           :  "Other proprietary",

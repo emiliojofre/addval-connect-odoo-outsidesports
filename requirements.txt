@@ -2,3 +2,4 @@ openai
 prophet
 statsmodels
 plotly
+pdf417gen

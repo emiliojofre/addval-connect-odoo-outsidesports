@@ -4,7 +4,7 @@
 {
     'name': 'Website Stock Availability Filter',
     'summary': """Display Products Avaliable in Stock On Website.""",
-    'version': '16.0.0.1',
+    'version': '19.0.1.0.0',
     'author': 'Bizople Solutions Pvt. Ltd',
     'website': "https://www.bizople.com/",
     'category': "Website",
