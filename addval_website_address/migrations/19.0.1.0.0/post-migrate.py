@@ -31,4 +31,5 @@ def migrate(cr, version):
     if to_delete:
         _logger.info("upgrade19 %s: borrando vistas obsoletas %s", MODULE, [(v.id, v.key, v.website_id.id) for v in to_delete])
         to_delete.with_context(no_cow=True, _force_unlink=True).unlink()
-    imds.filtered(lambda d: '%s.%s' % (d.module, d.name) not in loaded).exists().unlink()
+    # Al borrar una vista, 19 borra también su xmlid: exists() antes de leerlos.
+    imds.exists().filtered(lambda d: '%s.%s' % (d.module, d.name) not in loaded).unlink()
