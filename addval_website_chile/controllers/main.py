@@ -95,7 +95,9 @@ class ChileB2CAddressMixin:
                 msg = _("El RUT es obligatorio.")
                 if msg not in error_messages:
                     error_messages.append(msg)
-            elif vat and not _validar_rut(vat)[0]:
+            elif vat and not _validar_rut(vat)[0] and 'vat' not in invalid_fields:
+                # En 19 base_vat ya valida el RUT chileno; solo se añade el
+                # mensaje propio si la validación estándar no lo marcó.
                 invalid_fields.add('vat')
                 msg = _("RUT inválido. Verifica el dígito verificador. Ej: 12345678-9")
                 if msg not in error_messages:
