@@ -12,6 +12,7 @@
     "depends": [
         'website_sale',
         'stock',
+        'website_base_filter_attribute',
     ],
     'data': [
         'security/ir.model.access.csv',

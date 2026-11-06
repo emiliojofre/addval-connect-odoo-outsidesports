@@ -5,7 +5,7 @@
     "name" : "Odoo Website Product Labels & Stickers on Shop",
     "version" : "19.0.1.0.0",
     "category" : "eCommerce",
-    "depends" : ['website','website_sale','sale_management'],
+    "depends" : ['website','website_sale', 'website_base_filter_attribute','sale_management'],
     "author": "BrowseInfo",
     "summary": 'App website different stickers for product website product Ribbon Website Product Labels website product pin website labels eCommerce Product Ribbons webshop label pin webshop Product tag website label pin Website product item Ribbon Stickers tags pins',
     "description": """

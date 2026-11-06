@@ -17,7 +17,7 @@
         * Support Multi Website.
     """,
     'summary': 'show product internal reference in webiste page display internal reference display default code show internal reference show default code website defualt code website internal reference variant default code variant internal reference website product sku',
-    'depends' : ['base', 'website_sale'],
+    'depends' : ['base', 'website_sale', 'website_base_filter_attribute'],
     'price': 15,
     'currency': 'EUR',
     'license': 'OPL-1',
