@@ -3,8 +3,11 @@
     'name': 'Website B2B Login Required',
     'summary': 'Obliga login en sitio B2B y corrige el 500 al cerrar sesión (Odoo 16)',
     'description': """
-Website B2B Login (addval_website_b2b_login) — Odoo 16
+Website B2B Login (addval_website_b2b_login) — Odoo 19
 ======================================================
+
+Port 19 (Outside Sports): el cierre de sesión con auth='public' ya lo hace
+website de serie, así que se quita ese controlador.
 
 Fuerza autenticación en websites con ``b2b_login_required``.
 
@@ -16,7 +19,7 @@ en whitelist.
     'website': 'https://www.nlhconsultores.com',
     'category': 'Website/Website',
     'license': 'LGPL-3',
-    'version': '16.0.1.0.1',
+    'version': '19.0.1.0.1',
     'depends': ['website'],
     'data': [
         'views/website_views.xml',

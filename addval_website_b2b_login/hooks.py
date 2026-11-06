@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from odoo import SUPERUSER_ID, api
 
 
-def post_init_hook(cr, registry):
+def post_init_hook(env):
     """Enable B2B login on websites whose domain/name contains 'b2b'."""
-    env = api.Environment(cr, SUPERUSER_ID, {})
     for website in env['website'].search([]):
         haystack = ' '.join(filter(None, [
             website.domain or '',
