@@ -1,49 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<openerp>
-<data>
-<template id="pricelist_based_product_report.report_pricelist_products" >
-    <t t-call="web.html_container">
-    <t t-call="web.internal_layout">
-        <div class="page">
+<odoo>
+    <record id="pricelist_based_product_details_report" model="ir.actions.report">
+        <field name="name">Descarga catálogo y stock</field>
+        <field name="model">report.pricelist_based_product_report.report_pricelist_products</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pricelist_based_product_report.report_pricelist_products</field>
+    </record>
 
-            <div class="text-center">
-                <h2>Product Details</h2>
-            </div>
-
-            <table  class="table table-sm">
-                <thead><tr>
-                    <th>SKU</th>
-                    <th>Product</th>
-                    <th>Stock Available</th>
-                    <th>Price</th>
-                    <th>Proposed Selling Price</th>
-                </tr></thead>
-                <tbody>
-                <tr t-foreach='products' t-as='line'>
-                    <td><t t-esc="line['code']" /></td>
-                    <td><t t-esc="line['product_name']" /></td>
-                    <td>
-                        <t t-esc="line['quantity']" />
-<!--                        <t t-if='line["uom"] != "Unit(s)"'>-->
-<!--                            <t t-esc='line["uom"]' />-->
-<!--                        </t>-->
-                    </td>
-                    <td>
-                        <t t-esc='line["customer_price"]' />
-                    </td>
-                    <td><t t-esc="line['selling_price']"/></td>
-                </tr>
-                </tbody>
-            </table>
-
-            <br/>
-
-
-
-        </div>
-    </t>
-    </t>
-
-</template>
-</data>
-</openerp>
+    <!-- Port 19: tarjeta en la portada del portal (Mi cuenta). -->
+    <template id="my_pricelist_report_link" name="Link to pricelist report" inherit_id="portal.portal_my_home" priority="100">
+        <xpath expr="//div[@id='portal_common_category']" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/portal/static/src/img/portal-addresses.svg'"/>
+                <t t-set="title">Descarga catálogo y stock</t>
+                <t t-set="text">CSV con tus precios, stock disponible y precio sugerido a público</t>
+                <t t-set="url" t-value="'/my/pricelist_report/csv'"/>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+        </xpath>
+    </template>
+</odoo>

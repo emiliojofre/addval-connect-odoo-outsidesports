@@ -2,11 +2,11 @@
 
 {
     'name': 'Pricelist Based Product Report',
-    'version': '1.20210719',
+    'version': '19.0.1.0.0',
     'category': 'Report',
     'summary': "Allows you to print pricelist based report for products from website" ,
     'description': "Allows you to print pricelist based report for products from website",
-    'depends': ['portal','product','stock','website_sale','product_manufacturer','website_product_brands'],
+    'depends': ['portal', 'product', 'stock', 'website_sale', 'product_manufacturer', 'website_product_brands', 'addval_outside_custom'],
     'data': [
         'views/report_view.xml',
         'views/views.xml',
@@ -15,4 +15,5 @@
     'installable': True,
     'website': '',
     'auto_install': False,
+    'license': 'LGPL-3',
 }

@@ -1,29 +1,22 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Evitar creación de cuentas analíticas desde proyectos",
-
-    'summary': """
-        Módulo que salta la creación de cuentas analíticas desde proyectos""",
-
+    'name': "Addval Skip Analytic Project (obsoleto en 19)",
+    'summary': "Sin efecto en Odoo 19: se puede desinstalar",
     'description': """
-        Este módulo permite evitar la creación de cuentas analíticas cada vez que se crea un proyecto, desde el mismo módulo o desde el módulo de ventas
-    """,
-
+Port a Odoo 19 (Outside Sports): en 16 evitaba que cada proyecto creara una
+cuenta analítica. En 19 el proyecto solo crea cuenta analítica si está
+instalada la hoja de horas (hr_timesheet), que no se usa, así que el módulo
+queda vacío. Se mantiene solo para que el upgrade no falle; desinstalar
+después del paso a 19.
+""",
     "author": "Addval Connect",
     "website": "http://www.addval.cl",
-    "category": "Product",
+    "category": "Hidden",
     "license": "Other proprietary",
-    'version': '0.1',
-
-    'depends': ['base','account','sale_management', 'project'],
-
-    'data': [
-        #'views/account_move.xml',
-        'views/project.xml',
-        #'security/ir.model.access.csv',
-    ],
+    'version': '19.0.1.0.0',
+    'depends': ['project'],
+    'data': [],
     'installable': True,
-    'application': True,
+    'application': False,
     'auto_install': False,
-
 }

@@ -4,7 +4,7 @@
     'name': 'Outside Sotck API',
     'category': 'Custom',
     'author': 'Eduardo Velaochaga',
-    'version': '0.1',
+    'version': '19.0.1.0.0',
     'description': "Outside Sotck API",
     'depends': [
         'stock'

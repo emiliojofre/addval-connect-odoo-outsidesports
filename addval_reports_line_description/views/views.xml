@@ -1,202 +1,130 @@
-<!-- report_templates.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Port a Odoo 19 (Outside Sports): mismos cambios que en 16 sobre las
+    plantillas nuevas de 19 (xpaths por nombre de celda, no por posición):
+    - Factura, presupuesto y albarán: columna SKU y descripción = nombre del
+      producto (+ variantes en presupuesto y albarán).
+    - Presupuesto: cantidad sin unidad y sin columna de impuestos.
+    - Compra y solicitud de presupuesto: descripción = nombre del producto.
+    - Albarán: "STOCK A MANO" (cantidad disponible) en lugar de "Entregado".
+    - Guía de despacho (l10n_cl_edi_stock): títulos SKU/DESCRIPCIÓN, sin UdM.
+-->
 <odoo>
-    <!-- Herencia de account.report_invoice_document -->
     <template id="report_invoice_with_payments_inherit" inherit_id="account.report_invoice_document">
         <xpath expr="//th[@name='th_description']" position="before">
-            <th name="th_sku">
-                <strong>SKU</strong>
+            <th name="th_sku" class="text-start"><strong>SKU</strong></th>
+        </xpath>
+        <xpath expr="//td[@name='account_invoice_line_name']" position="replace">
+            <td name="td_sku">
+                <span t-field="line.product_id.default_code" t-options="{'widget': 'text'}"/>
+            </td>
+            <td name="account_invoice_line_name">
+                <span t-field="line.product_id.name" t-options="{'widget': 'text'}"/>
+            </td>
+        </xpath>
+        <!-- Secciones y notas ocupan una columna más (la de SKU). -->
+        <xpath expr="(//t[@t-set='line_colspan'])[1]" position="attributes">
+            <attribute name="t-value">4 + (1 if display_discount else 0) + (1 if display_taxes and not line.tax_ids else 0)</attribute>
+        </xpath>
+    </template>
+
+    <template id="report_purchaseorder_document_inherit" inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="//td[@id='product']/span[@t-field='line.name']" position="replace">
+            <span t-field="line.product_id.name"/>
+        </xpath>
+    </template>
+
+    <template id="report_purchasequotation_document_inherit"
+              inherit_id="purchase.report_purchasequotation_document" priority="30">
+        <xpath expr="//td[@id='product']/span[@t-field='order_line.name']" position="replace">
+            <span t-field="order_line.product_id.name"/>
+        </xpath>
+    </template>
+
+    <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document" priority="55">
+        <!-- Sin columna de impuestos (en 16 se borraban th/td a mano). -->
+        <xpath expr="//t[@t-set='display_taxes']" position="attributes">
+            <attribute name="t-value">False</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_default_code" class="text-start">
+                <t t-set="colspan_count" t-value="colspan_count + 1"/>
+                <span>SKU</span>
             </th>
         </xpath>
-        <xpath expr="//td[span[@t-field='line.name']]" position="replace">
-            <td>
-                <span t-field="line.product_id.default_code" t-options="{'widget': 'text'}" />
+        <xpath expr="//td[@name='td_product_name']" position="replace">
+            <td name="td_default_code">
+                <span t-field="line.product_id.default_code"/>
             </td>
-            <td>
-                <span t-field="line.product_id.name" t-options="{'widget': 'text'}" />
-            </td>
-        </xpath>
-    </template>
-
-    <!-- Herencia de purchase.report_purchaseorder -->
-    <template id="report_purchaseorder_document_inherit"
-        inherit_id="purchase.report_purchaseorder_document">
-        <xpath expr="//td[span[@t-field='line.name']]" position="replace">
-            <td>
-                <span t-field="line.product_id.name" />
+            <td name="td_product_name" t-att-class="padding_class">
+                <span t-field="line.product_id.name"/>
+                <span t-out="', '.join(line.product_id.product_template_variant_value_ids.mapped('name'))"/>
             </td>
         </xpath>
-    </template>
-
-    <!-- Herencia de purchase.report_purchasequotation -->
-    <template id="report_purchasequotation_document_inherit"
-        inherit_id="purchase.report_purchasequotation_document" priority="30">
-        <xpath expr="//td[span[@t-field='order_line.name']]" position="replace">
-            <td>
-                <span t-field="order_line.product_id.name" />
-            </td>
-        </xpath>
-    </template>
-
-    <!-- Herencia de sale.report_saleorder -->
-    <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document" priority="55">
-        <xpath expr="//th[@name='th_description']" position="before">
-            <th name="th_default_code" class="text-start">SKU</th>
-        </xpath>
-        <xpath expr="//td[span[@t-field='line.name']]" position="replace">
-            <td>
-                <span t-field="line.product_id.default_code" />
-            </td>
-            <td>
-                <span t-field="line.product_id.name" />
-                <t t-set="variant_names" t-value="[]"/>
-                <t t-foreach="line.product_id.product_template_variant_value_ids" t-as="variant_value">
-                    <t t-set="variant_names" t-value="variant_names + [variant_value.name]"/>
-                </t>
-                <span>
-                    <t t-esc="', '.join(variant_names)"/>
-                </span>
-            </td>
-        </xpath>
-        <xpath expr="//td[@name='td_quantity']" position="replace">
-            <td name="td_quantity" class="text-end">
+        <xpath expr="//td[@name='td_product_quantity']" position="replace">
+            <td name="td_product_quantity" class="o_td_quantity text-end">
                 <span t-field="line.product_uom_qty"/>
             </td>
         </xpath>
-
-        <xpath expr="//th[@name='th_taxes']" position="replace">
-        </xpath>
-        
-        <xpath expr="//td[@name='td_taxes']" position="replace">
-        </xpath>
     </template>
-    
-    <!-- Herencia de stock.report_delivery_document -->
+
     <template id="report_delivery_document_inherit" inherit_id="stock.report_delivery_document" priority="30">
         <xpath expr="//th[@name='th_sm_product']" position="before">
-            <th>
-                <strong>SKU</strong>
-            </th>
+            <th name="th_sm_sku"><strong>SKU</strong></th>
         </xpath>
         <xpath expr="//th[@name='th_sml_product']" position="before">
             <th name="th_sml_sku"><strong>SKU</strong></th>
         </xpath>
-        <xpath expr="//table[@name='stock_move_table']/tbody/tr[1]/td[1]" position="replace">
-            <td>
-                <span t-field="move.product_id.default_code" />
-            </td>
-            <td>
-                <span t-field="move.product_id.name" />
-                <t t-set="variant_names" t-value="[]"/>
-                <t t-foreach="move.product_id.product_template_variant_value_ids" t-as="variant_value">
-                    <t t-set="variant_names" t-value="variant_names + [variant_value.name]"/>
-                </t>
-                <span>
-                    <t t-esc="', '.join(variant_names)"/>
-                </span>
-            </td>
-        </xpath>
         <xpath expr="//th[@name='th_sm_quantity']" position="replace">
-            <th>
-                <strong>STOCK A MANO</strong>
-            </th>
+            <th name="th_sm_quantity" class="text-end"><strong>STOCK A MANO</strong></th>
         </xpath>
-
         <xpath expr="//th[@name='th_sml_quantity']" position="replace">
-            <th name="th_sml_quantity" class="text-center"><strong>STOCK A MANO</strong></th>
+            <th name="th_sml_quantity" class="text-end"><strong>STOCK A MANO</strong></th>
         </xpath>
-
-        <xpath expr="//table[@name='stock_move_table']/tbody/tr[1]/td[2]" position="replace">
-            <td>
-                <span t-field="move.product_uom_qty"/>
-            </td>
-        </xpath>
-
-        <xpath expr="//table[@name='stock_move_table']/tbody/tr[1]/td[3]" position="replace">
-            <td>
+        <!-- Primero la celda de entregado (td[3]); luego se parte td[1] en SKU + nombre. -->
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr[@t-foreach='lines']/td[3]" position="replace">
+            <td class="o_td_quantity text-end">
                 <span t-field="move.product_id.qty_available"/>
             </td>
         </xpath>
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr[@t-foreach='lines']/td[1]" position="replace">
+            <td>
+                <span t-field="move.product_id.default_code"/>
+            </td>
+            <td>
+                <span t-field="move.product_id.name"/>
+                <span t-out="', '.join(move.product_id.product_template_variant_value_ids.mapped('name'))"/>
+            </td>
+        </xpath>
     </template>
 
-    <!--Asi debe quedar esta vista editar en el template
-    <template id="stock_report_delivery_has_serial_move_line_inherit" inherit_id="stock.stock_report_delivery_has_serial_move_line" priority="30">
-        <t t-name="stock.stock_report_delivery_has_serial_move_line">
-            <td>
-                <span t-field="move_line.product_id.default_code"/>
-            </td>
-            <td>
-                <span t-field="move_line.product_id.name"/>
-                <t t-set="variant_names" t-value="[]"/>
-                <t t-foreach="move_line.product_id.product_template_variant_value_ids" t-as="variant_value">
-                    <t t-set="variant_names" t-value="variant_names + [variant_value.name]"/>
-                </t>
-                <span>
-                    <t t-esc="', '.join(variant_names)"/>
-                </span>
-                <t t-if="not description and description != ''">
-                    <t t-set="description" t-value="move_line.move_id.description_picking"/>
-                </t>
-                <p t-if="description !='' and description != move_line.product_id.name">
-                    <span t-esc="description"/>
-                </p>
-            </td>
-            <t t-if="has_serial_number" name="move_line_lot">
-                <td><span t-field="move_line.lot_id.name"/></td>
-            </t>
-            <td class="text-center" name="move_line_lot_qty_done">
-                <span t-field="move_line.product_id.qty_available"/>
-            </td>
-        </t>
-    </template>-->
-
-    <template id="stock_report_delivery_aggregated_move_lines_inherit" inherit_id="stock.stock_report_delivery_aggregated_move_lines" priority="30">  
+    <template id="stock_report_delivery_aggregated_move_lines_inherit"
+              inherit_id="stock.stock_report_delivery_aggregated_move_lines" priority="30">
         <xpath expr="//tr[@t-foreach='aggregated_lines']/td[1]" position="replace">
             <td>
-                <span t-esc="aggregated_lines[line]['product'].default_code"/>
+                <span t-out="aggregated_lines[line]['product'].default_code"/>
             </td>
             <td>
-                <span t-esc="aggregated_lines[line]['product'].name"/>
-                <t t-set="variant_names" t-value="[]"/>
-                <t t-foreach="aggregated_lines[line]['product'].product_template_variant_value_ids" t-as="variant_value">
-                    <t t-set="variant_names" t-value="variant_names + [variant_value.name]"/>
-                </t>
-                <span>
-                  <t t-esc="', '.join(variant_names)"/>
-                </span>
+                <span t-out="aggregated_lines[line]['product'].name"/>
+                <span t-out="', '.join(aggregated_lines[line]['product'].product_template_variant_value_ids.mapped('name'))"/>
             </td>
         </xpath>
-        <xpath expr="//td[@name='move_line_aggregated_qty_ordered']" position="replace">
-            <td class="text-center" name="move_line_aggregated_qty_ordered">
-                <span t-esc="aggregated_lines[line]['qty_ordered']" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
-            </td>
-        </xpath>
-        <xpath expr="//td[@name='move_line_aggregated_qty_done']" position="replace">
-            <td class="text-center" name="move_line_aggregated_qty_done">
-                <t t-if="aggregated_lines[line]['qty_done']">
-                    <span t-esc="aggregated_lines[line]['product'].qty_available" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
-                </t>
+        <xpath expr="//td[@name='move_line_aggregated_quantity']" position="replace">
+            <td class="text-end" name="move_line_aggregated_quantity">
+                <span t-out="format_number(aggregated_lines[line]['product'].qty_available)"/>
             </td>
         </xpath>
     </template>
-    
 
-    <!-- Herencia de purchase.report_purchasequotation -->
     <template id="delivery_guide_document_inherit"
-        inherit_id="l10n_cl_edi_stock.delivery_guide_document" priority="30">
+              inherit_id="l10n_cl_edi_stock.delivery_guide_document" priority="30">
         <xpath expr="//th[@name='th_code']" position="replace">
-            <th name="th_sku">
-                <strong>SKU</strong>
-            </th>
+            <th name="th_sku"><strong>SKU</strong></th>
         </xpath>
         <xpath expr="//th[@name='th_product']" position="replace">
-            <th name="th_product">
-                <strong>DESCRIPCIÓN</strong>
-            </th>
+            <th name="th_product"><strong>DESCRIPCIÓN</strong></th>
         </xpath>
-        <xpath expr="//th[@groups='uom.group_uom']" position="replace">
-        </xpath>
-        <xpath expr="//td[@groups='uom.group_uom']" position="replace">
-        </xpath>
+        <xpath expr="//th[@groups='uom.group_uom']" position="replace"/>
+        <xpath expr="//td[@groups='uom.group_uom']" position="replace"/>
     </template>
-
 </odoo>

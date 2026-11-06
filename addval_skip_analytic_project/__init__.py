@@ -1,4 +1,2 @@
 # -*- coding: utf-8 -*-
-
-from . import controllers
-from . import models
+# Port 19: sin código (ver __manifest__).
