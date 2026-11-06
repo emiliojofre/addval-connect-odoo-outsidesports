@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Desde 17 un proveedor necesita un método de pago para aparecer en el
+         checkout. -->
+    <record id="payment_method_credit" model="payment.method">
+        <field name="name">Crédito</field>
+        <field name="code">credit</field>
+        <field name="sequence">5</field>
+        <field name="image" type="base64" file="payment/static/img/bank.png"/>
+        <field name="support_tokenization">False</field>
+        <field name="support_express_checkout">False</field>
+        <field name="support_manual_capture">none</field>
+        <field name="support_refund">none</field>
+    </record>
+</odoo>

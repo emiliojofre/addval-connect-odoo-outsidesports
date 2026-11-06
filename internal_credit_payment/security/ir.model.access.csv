@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+internal_credit_payment_sale_manager_user,internal_credit_payment_sale_manager_username,model_partner_credit,sales_team.group_sale_manager,1,1,1,1
+internal_credit_payment_employee_user,internal_credit_payment_employee_username,model_partner_credit,sales_team.group_sale_salesman,1,1,1,0
+access_update_credit_history_manager,update.credit.history.manager,model_update_credit_history,base.group_user,1,1,1,1
+access_update_credit_history_payment_manager,update.credit.history.payment.manager,model_update_credit_history_payment,base.group_user,1,1,1,1

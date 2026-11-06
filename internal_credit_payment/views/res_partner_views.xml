@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="website_credit_payment_button_res_partner" model="ir.ui.view">
+        <field name="name">res.partner.form.credit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" name="action_view_credit_detail" type="object" icon="fa-usd"
+                        groups="sales_team.group_sale_salesman">
+                    <field string="Crédito" name="custom_credit" widget="statinfo"/>
+                </button>
+            </div>
+            <notebook position="inside">
+                <page string="Crédito" name="customer_credit" groups="sales_team.group_sale_salesman">
+                    <group>
+                        <field name="allow_credit"/>
+                    </group>
+                    <separator string="Historial de crédito"/>
+                    <field name="update_credit_ids" readonly="1">
+                        <list>
+                            <field name="approve_date"/>
+                            <field name="updated_amount"/>
+                            <field name="prev_amount"/>
+                            <field name="amount"/>
+                        </list>
+                    </field>
+                    <separator string="Historial de crédito con pago" invisible="not update_credit_payment_ids"/>
+                    <field name="update_credit_payment_ids" readonly="1" invisible="not update_credit_payment_ids">
+                        <list>
+                            <field name="approve_date"/>
+                            <field name="updated_amount"/>
+                            <field name="prev_amount"/>
+                            <field name="amount"/>
+                            <field name="payment_refer"/>
+                        </list>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>
