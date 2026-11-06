@@ -9,6 +9,7 @@ class ProductProduct(models.Model):
     )
 
 
-    @api.depends('list_price')
+    @api.depends('lst_price')
     def _compute_product_pvp(self):
-        self.product_product_pvp =  self.lst_price*1.19
+        for record in self:
+            record.product_product_pvp = record.lst_price * 1.19

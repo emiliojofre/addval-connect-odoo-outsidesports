@@ -19,7 +19,7 @@ class ProductWebsiteLabel(models.Model):
         help='Solo para labels de tipo "Custom Ribbons". '
              'Si se deja vacío se usa el texto general del producto.')
 
-    _sql_constraints = [
-        ('product_website_uniq', 'unique(product_tmpl_id, website_id)',
-         'Este producto ya tiene una label definida para ese sitio web.'),
-    ]
+    _product_website_uniq = models.Constraint(
+        'unique(product_tmpl_id, website_id)',
+        'Este producto ya tiene una label definida para ese sitio web.',
+    )

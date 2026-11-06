@@ -20,10 +20,10 @@ class ProductTemplate(models.Model):
         for record in self:
             record.product_tmpl_pvp =  record.list_price*1.19
 
-    def _get_combination_info(self, combination=False, product_id=False, add_qty=1, pricelist=False, parent_combination=False, only_template=False):
-        combination_info = super(ProductTemplate, self)._get_combination_info(
-            combination=combination, product_id=product_id, add_qty=add_qty, pricelist=pricelist,
-            parent_combination=parent_combination, only_template=only_template)
+    def _get_combination_info(self, combination=False, product_id=False, add_qty=1.0, uom_id=False, only_template=False):
+        combination_info = super()._get_combination_info(
+            combination=combination, product_id=product_id, add_qty=add_qty, uom_id=uom_id,
+            only_template=only_template)
         default_code = ''
         pvp = 0
         if combination_info.get('product_id'):

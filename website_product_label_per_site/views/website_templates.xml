@@ -10,7 +10,7 @@
                      t-att-title="wlabel.name"
                      t-att-style="wlabel.get_wpl_image_style()"/>
                 <span t-if="wlabel.label_type == 'custom'" class="label_font"
-                      t-esc="wlabel_title"
+                      t-out="wlabel_title"
                       t-att-style="wlabel.get_wpl_font_style()"/>
             </span>
         </div>

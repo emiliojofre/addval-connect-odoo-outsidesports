@@ -6,7 +6,7 @@
             <field name="name">odoo.website.product.label.tree.view</field>
             <field name="model">website.product.label</field>
             <field name="arch" type="xml">
-               <tree string="Website Product Label">													
+               <list string="Website Product Label">													
 					 <field name="name"/>
 					 <field name="position"/>
 			    	 <field name="height"/>
@@ -17,7 +17,7 @@
 			    	 <field name="margin_right"/>
 			    	 <field name="rotate_label" widget='radio'/>
 			    	 <field name="rotate_value"/>
-				</tree>
+				</list>
 		    </field>
         </record>
 
@@ -27,7 +27,7 @@
             <field name="name">odoo.website.product.label.form.view</field>
             <field name="model">website.product.label</field>
             <field name="arch" type="xml">
-				<form string="Website Product Label" version="9.0">
+				<form string="Website Product Label">
 						<sheet>
 							<field name="image" widget="image" class="oe_avatar"/>
 							<div class="oe_title">
@@ -52,12 +52,12 @@
 								 <label for="rotate_label" string="Rotate Fonts"/>
 								 <div class="oe_inline">
 								 	<field name="rotate_label" widget='radio' nolabel="1"/>
-								 	<button class="oe_stat_button" name="unset_img_rotation" string="Unset" type="object" attrs="{'invisible': [('rotate_label', '=', False)]}"/>
+								 	<button class="oe_stat_button" name="unset_img_rotation" string="Unset" type="object" invisible="not rotate_label"/>
 								 </div>
-								 <field name="rotate_value" attrs="{'required':[('rotate_label','!=',False)],'invisible': [('rotate_label', '=', False)]}"/>
+								 <field name="rotate_value" required="rotate_label" invisible="not rotate_label"/>
 							</group>
 
-							<group string="Font Position" attrs="{'invisible': [('label_type', '=', 'defined')]}">
+							<group string="Font Position" invisible="label_type == 'defined'">
 								<field name="font_color" placeholder='#ffffff or white or rgb(34,34,34)'/>
 								<field name="font_size"/>
 								 <field name="font_top" placeholder="eg. 5 or -5"/>
@@ -67,9 +67,9 @@
 								 <label for="font_rotate_label" string="Rotate Fonts"/>
 								 <div class="oe_inline">
 								 	<field name="font_rotate_label" widget='radio' nolabel="1"/>
-								 	<button class="oe_stat_button" name="unset_font_rotation" string="Unset" type="object" attrs="{'invisible': [('font_rotate_label', '=', False)]}"/>
+								 	<button class="oe_stat_button" name="unset_font_rotation" string="Unset" type="object" invisible="not font_rotate_label"/>
 								 </div>
-								 <field name="font_rotate_value" attrs="{'required':[('font_rotate_label','!=',False)],'invisible': [('font_rotate_label', '=', False)]}"/>
+								 <field name="font_rotate_value" required="font_rotate_label" invisible="not font_rotate_label"/>
 							</group>
 						</group>
 					 	
@@ -82,40 +82,21 @@
             <field name="name">odoo.website.product.label.kanban.bi</field>
             <field name="model">website.product.label</field>
             <field name="arch" type="xml">
-                <kanban class="o_res_partner_kanban" >
-                    <field name="id"/>
-                    <field name="image" widget="image" class="oe_left oe_avatar"/>
-                    <field name="name"/>
-                    <field name="position"/>
-                    <field name="height"/>
-					<field name="width"/>
-					
+                <kanban>
                     <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_global_click">
-                                <div class="o_kanban_image">
-                                    <img t-att-src="kanban_image('website.product.label', 'image', record.id.raw_value)" alt="Label Image"/>
-                                </div>
-                                <div class="oe_kanban_details">
-                                	<div class="o_kanban_record_top mb8">
-	                                    <strong>
-	                                        <field name="label_type" widget="label_selection" options="{'classes': { 'custom': 'warning', 'defined': 'success'}}"/>
-	                                    </strong>
-	                                </div>
-                                    <strong>
-                                        <field name="name"/>
-                                    </strong>
-                                    <ul>
-                                        <li>Position: <field name="position"></field></li>
-                                        <li>Height: <field name="height"></field></li>
-                                        <li>Width: <field name="width"></field></li>
-                                    </ul>
-                                    <div name="tags"/>
-                                </div>
-                            </div>
+                        <t t-name="card" class="flex-row">
+                            <aside class="o_kanban_aside_full">
+                                <field name="image" widget="image" options="{'img_class': 'object-fit-contain'}"/>
+                            </aside>
+                            <main class="ms-2">
+                                <field name="label_type" widget="label_selection" options="{'classes': {'custom': 'warning', 'defined': 'success'}}"/>
+                                <field name="name" class="fw-bold"/>
+                                <div>Position: <field name="position"/></div>
+                                <div>Height: <field name="height"/></div>
+                                <div>Width: <field name="width"/></div>
+                            </main>
                         </t>
-                   </templates>
-                    
+                    </templates>
                 </kanban>
             </field>
         </record>
@@ -127,7 +108,7 @@
             <field name="name">Odoo Website Product Label</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">website.product.label</field>
-            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_mode">kanban,list,form</field>
         </record>
 		
 		<menuitem id= "odoo_website_product_label_menu" parent= "sale.product_menu_catalog" name= "Website Product Label" action="action_odoo_website_product_label_menu" sequence="30" />
@@ -142,8 +123,8 @@
 				    <xpath expr="//page[@name='sales']/group[@name='sale']" position="after"> 
 						 <group string="Website Product Label">
 								<field name="label_type"/>
-								<field name="lbl_title" attrs="{'invisible': [('label_type','=','defined')]}" />     
-								<field name="select_label" readonly="0"/>  
+								<field name="lbl_title" invisible="label_type == 'defined'" />     
+								<field name="select_label" readonly="0" domain="[('label_type', '=', label_type)] if label_type else []"/>  
 								<field name="label_image" widget="image" class="oe_left oe_avatar"/> 
 		                  </group>
 					</xpath>

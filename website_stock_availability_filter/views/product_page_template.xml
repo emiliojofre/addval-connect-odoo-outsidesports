@@ -30,7 +30,7 @@ See LICENSE file for full copyright and licensing details -->
 
 	<!-- En 16 se mostraba también fuera del formulario cuando no había atributos;
 	     en 19 el contenedor estándar solo existe si hay atributos o etiquetas. -->
-	<template id="avalible_in_stock_no_attributes" name="Availability Filter (sin atributos)"
+	<template id="avalible_in_stock_offcanvas" name="Availability Filter (sin atributos)"
 			  inherit_id="website_sale.products_attributes" priority="9">
 		<xpath expr="//div[@id='wsale_products_attributes_collapse']" position="attributes">
 			<attribute name="t-if">True</attribute>

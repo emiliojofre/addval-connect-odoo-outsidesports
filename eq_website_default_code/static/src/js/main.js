@@ -1,29 +1,21 @@
-odoo.define('eq_website_default_code.VariantMixin', function(require) {
-'use strict';
+/** @odoo-module **/
+// Port a Odoo 19 (Outside Sports): actualiza SKU y PVP al cambiar de variante.
 
-const {Markup} = require('web.utils');
-var VariantMixin = require('sale.VariantMixin');
-var publicWidget = require('web.public.widget');
+import { patch } from '@web/core/utils/patch';
+import { WebsiteSale } from '@website_sale/interactions/website_sale';
 
-require('website_sale.website_sale');
-
-VariantMixin._onChangeProductDefaultcode = function(ev, $parent, combination) {
-	var $default_code = $parent.find('.default_code');
-	var $pvp = $parent.find('.pvp');
-
-	$default_code.text(combination.default_code || '');
-	var formattedPvp = new Intl.NumberFormat('de-DE').format(combination.pvp);
-	$pvp.text(formattedPvp || '');
-};
-
-publicWidget.registry.WebsiteSale.include({
-
-	_onChangeCombination : function() {
-		this._super.apply(this, arguments);
-		VariantMixin._onChangeProductDefaultcode.apply(this, arguments);
-	}
-});
-
-return VariantMixin;
-
+patch(WebsiteSale.prototype, {
+    _onChangeCombination(ev, parent, combination) {
+        super._onChangeCombination(...arguments);
+        const defaultCodeEl = parent.querySelector('.default_code');
+        if (defaultCodeEl) {
+            defaultCodeEl.textContent = combination.default_code || '';
+        }
+        const pvpEl = parent.querySelector('.pvp');
+        if (pvpEl) {
+            pvpEl.textContent = combination.pvp
+                ? new Intl.NumberFormat('de-DE').format(combination.pvp)
+                : '';
+        }
+    },
 });

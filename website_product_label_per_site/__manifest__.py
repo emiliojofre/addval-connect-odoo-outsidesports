@@ -6,7 +6,7 @@ Extiende odoo_website_product_label (BrowseInfo) para elegir una label
 distinta para cada sitio web. La label general del producto se sigue usando
 en los sitios que no tengan una label propia.
 """,
-    'version': '16.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Website/eCommerce',
     'author': 'Outside Sports',
     'license': 'LGPL-3',

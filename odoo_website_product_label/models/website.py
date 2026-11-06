@@ -12,23 +12,6 @@ class product_template(models.Model):
 	select_label = fields.Many2one('website.product.label','Select Product Label')
 	label_image = fields.Binary('Label Image')
 
-	@api.onchange('label_type')
-	def _get_labels(self):
-		temp = self
-		self = self.env['product.template'].browse(self._origin.id)
-
-		label_obj = self.env['website.product.label'].search([])
-		label_list = []
-		selected_lbl_type = self.label_type
-		for i in label_obj:
-			if i.label_type == selected_lbl_type:
-				label_list.append(i.id)
-		
-		if temp.label_type == 'custom':
-			return {'domain': {'select_label': [('label_type', '=','custom')]}}
-		if temp.label_type == 'defined':
-			return {'domain': {'select_label': [('label_type','=','defined')]}}
-
 	@api.onchange('select_label')
 	def onchange_product_label(self):
 		self.label_image = self.select_label.image        
@@ -51,7 +34,7 @@ class website_product_label(models.Model):
 		('bottomleft', 'Bottom Left'),
 		('bottomright', 'Bottom Right'),
 		('bottomcenter', 'Bottom Center'),
-		], 'Position of Label', default="topleft",  select=True)
+		], 'Position of Label', default="topleft")
 	margin_top = fields.Char('Margin Top (in px)')
 	margin_bottom = fields.Char('Margin Bottom (in px)')
 	margin_left = fields.Char('Margin Left (in px)')

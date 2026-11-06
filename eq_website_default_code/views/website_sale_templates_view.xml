@@ -1,34 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Port a Odoo 19 (Outside Sports): se quitan las opciones del editor
+    (website.snippet_options ya no existe en 19); las dos vistas se siguen
+    activando o desactivando por sitio desde Sitio web > Configuración > Vistas.
+-->
 <odoo>
     <data>
 
-    <template id="website_default_code_snippet_option" inherit_id="website.snippet_options">
-        <xpath expr="//we-row[@id='o_wsale_grid_left_panel']" position="before">
-            <we-checkbox string="Prod.Internal Reference"
-                data-customize-website-views="eq_website_default_code.products_item_default_codes"
-                data-no-preview="true" data-reload="/"/>
-        </xpath>
-
-        <xpath expr="//div[@data-js='WebsiteSaleProductPage']//we-select[@data-name='variants_opt']" position="before">
-            <we-checkbox string="Prod.Internal Reference"
-                data-customize-website-views="eq_website_default_code.product_default_codes"
-                data-no-preview="true" data-reload="/"/>
-        </xpath>
-
-    </template>
-
     <template id="product_default_codes" inherit_id="website_sale.product" active="True" name="Product Internal Reference">
-        <xpath expr="//div[@id='product_details']//form//div[@id='contact_us_wrapper']" position="after">
+        <xpath expr="//div[@id='contact_us_wrapper']/.." position="after">
            <t t-if="combination_info['default_code']">
-                <div clas="d-flex flex-wrap align-items-center">
-                    <hr/>
+                <div class="d-flex flex-column mb-4">
                     <div>
                         <span style="font-weight: bold;">SKU: </span>
-                        <span style="margin-left:3px;font-weight: bold;" class="default_code" t-esc="combination_info['default_code']" />
+                        <span style="margin-left:3px;font-weight: bold;" class="default_code" t-out="combination_info['default_code']"/>
                     </div>
                     <div>
                         <span style="font-weight: bold;">PVP: $</span>
-                        <span style="margin-left:3px;font-weight: bold;" class="pvp" t-esc="combination_info['pvp']" t-options="{'widget': 'monetary', 'display_currency': product.currency_id, 'format': '#.##0,00'}"/>
+                        <span style="margin-left:3px;font-weight: bold;" class="pvp" t-out="combination_info['pvp']" t-options="{'widget': 'monetary', 'display_currency': product.currency_id, 'format': '#.##0,00'}"/>
                     </div>
                 </div>
             </t>

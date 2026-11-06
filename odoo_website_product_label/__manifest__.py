@@ -3,7 +3,7 @@
 
 {
     "name" : "Odoo Website Product Labels & Stickers on Shop",
-    "version" : "16.0.0.1",
+    "version" : "19.0.1.0.0",
     "category" : "eCommerce",
     "depends" : ['website','website_sale','sale_management'],
     "author": "BrowseInfo",
