@@ -19,6 +19,9 @@ def migrate(cr, version):
     to_activate = View
     to_delete = View
     for view in views:
+        if not view.website_id:
+            to_activate |= view
+            continue
         generic = View.search([('key', '=', view.key), ('website_id', '=', False)], limit=1)
         if generic:
             to_activate |= view

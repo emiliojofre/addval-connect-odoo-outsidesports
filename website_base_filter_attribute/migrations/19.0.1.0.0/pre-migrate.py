@@ -1,10 +1,9 @@
 # Upgrade 16 -> 19 (Outside Sports).
-# Las copias por sitio (COW) de las vistas de los módulos de tienda de terceros
-# no tienen xmlid, así que Odoo las aplica siempre al validar, aunque su módulo
-# aún no se haya actualizado. Con el arch de 16 rompen la validación de los
-# módulos que se actualizan antes. Se desactivan aquí (este módulo se carga
-# primero) y website_product_brands las reactiva en su post-migrate, cuando
-# todos ya tienen el arch de 19.
+# Las vistas de los módulos de tienda de terceros (genéricas y, sobre todo, sus
+# copias por sitio/COW, que no tienen xmlid) siguen activas con el arch de 16
+# mientras se actualizan otros módulos y rompen su validación. Se desactivan
+# aquí (este módulo se carga primero) y website_product_brands las reactiva en
+# su post-migrate, cuando todos ya tienen el arch de 19.
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -23,9 +22,8 @@ def migrate(cr, version):
     cr.execute("""
         UPDATE ir_ui_view
            SET active = false
-         WHERE website_id IS NOT NULL
-           AND active
-           AND arch_updated IS NOT TRUE
+         WHERE active
+           AND (website_id IS NULL OR arch_updated IS NOT TRUE)
            AND split_part(key, '.', 1) || '.' = ANY(%s)
      RETURNING id
     """, (list(PREFIXES),))
