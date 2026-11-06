@@ -223,8 +223,10 @@ class Client(object):
         # quedar colgada hasta que Flow/el proxy cortaran con 504).
         timeout = urllib3.Timeout(connect=5.0, read=20.0)
         try:
+            # Port 19: urllib3 2.x cambió el 3er argumento posicional de
+            # request() de `fields` a `body`; se pasa por nombre.
             response = pool.request(
-                method, url, values, timeout=timeout, retries=False
+                method, url, fields=values, timeout=timeout, retries=False
             )
         except urllib3.exceptions.HTTPError as e:
             _logger.warning(u"Error de conexión con Flow: {0}".format(e))
