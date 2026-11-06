@@ -7,9 +7,8 @@
             <field name="inherit_id" ref="payment.payment_provider_form"/>
             <field name="arch" type="xml">
                 <field name="available_country_ids" position="before">
-                    <field name="currency_ids" widget="many2many_tags"/>
                     <field name="force_currency"/>
-                    <field attrs="{'invisible':[('force_currency', '=', False)]}" name="force_currency_id"/>
+                    <field name="force_currency_id" invisible="not force_currency"/>
                 </field>
             </field>
         </record>

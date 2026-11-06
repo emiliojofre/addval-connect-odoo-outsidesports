@@ -2,7 +2,7 @@
 
 {
     'name': 'Payment Provider Currencies',
-    'version': "16.0.1.0.1",
+    'version': "19.0.1.0.0",
     'summary': 'Chilean Flow Payment Provider',
     'description': """Payment Provider: Chilean Flow Payment Provider""",
     'license': 'AGPL-3',

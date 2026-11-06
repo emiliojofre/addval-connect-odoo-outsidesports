@@ -5,16 +5,14 @@
         <field name="model">payment.transaction</field>
         <field name="inherit_id" ref="payment.payment_transaction_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='action_void']" position="before">
-                <button attrs="{'invisible': ['|', ('provider_code', '!=', 'flow'), ('state', '!=', 'draft')]}"
-                        name="flow_getTransactionfromCommerceId"
-                        string="Obtener Datos usando CommerceID"
-                        type="object"/>
+            <xpath expr="//header" position="inside">
+                <button name="action_flow_fetch_status" type="object"
+                        string="Consultar estado en Flow"
+                        invisible="provider_code != 'flow' or state not in ('draft', 'pending', 'error')"/>
             </xpath>
-
             <xpath expr="//field[@name='provider_reference']" position="after">
-                <field attrs="{'invisible': [('provider_code', '!=', 'flow')]}" name="flow_token"/>
-                <field attrs="{'invisible': [('provider_code', '!=', 'flow')]}" name="fees"/>
+                <field name="flow_token" invisible="provider_code != 'flow'"/>
+                <field name="fees" invisible="provider_code != 'flow'"/>
             </xpath>
         </field>
     </record>

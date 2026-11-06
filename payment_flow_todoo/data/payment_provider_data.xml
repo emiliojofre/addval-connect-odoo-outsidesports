@@ -7,7 +7,7 @@
         <field name="module_id" ref="base.module_payment_flow_todoo"/>
         <field name="company_id" ref="base.main_company"/>
         <field name="redirect_form_view_id" ref="redirect_form"/>
+        <field name="payment_method_ids" eval="[Command.set([ref('payment_method_flow')])]"/>
         <field name="state">test</field>
     </record>
-
 </odoo>

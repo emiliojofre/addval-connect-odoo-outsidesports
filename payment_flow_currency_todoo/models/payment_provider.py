@@ -1,10 +1,9 @@
-# -*- coding: utf-'8' "-*-"|
-import logging
-
+# -*- coding: utf-8 -*-
+# Port a Odoo 19 (Outside Sports): se conservan los campos (en producción
+# vacíos/desactivados). compute_fees se elimina: la función de comisiones ya
+# no existe en el núcleo desde 17. Para limitar monedas, 19 tiene el campo
+# estándar available_currency_ids en el proveedor.
 from odoo import models, fields
-from odoo.tools import float_round
-
-_logger = logging.getLogger(__name__)
 
 
 class PaymentAcquirerCurrency(models.Model):
@@ -22,11 +21,3 @@ class PaymentAcquirerCurrency(models.Model):
         'res.currency',
         string='Currency id',
     )
-
-    def compute_fees(self, amount, currency_id, partner_country_id):
-        fees_method_name = '%s_compute_fees' % self.provider
-        fees_amount = 0
-        if hasattr(self, fees_method_name):
-            fees = getattr(self, fees_method_name)(amount, currency_id, partner_country_id)
-            fees_amount = float_round(fees, 2)
-        return fees_amount

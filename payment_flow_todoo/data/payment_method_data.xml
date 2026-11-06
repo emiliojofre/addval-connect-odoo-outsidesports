@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Port 19: desde 17 un proveedor necesita al menos un método de pago para
+         aparecer en el checkout. Flow muestra su propia página con todos sus
+         medios (Webpay, transferencia, etc.). -->
+    <record id="payment_method_flow" model="payment.method">
+        <field name="name">Flow</field>
+        <field name="code">flow</field>
+        <field name="sequence">10</field>
+        <field name="image" type="base64" file="payment_flow_todoo/static/description/icon.png"/>
+        <field name="support_tokenization">False</field>
+        <field name="support_express_checkout">False</field>
+        <field name="support_refund">none</field>
+        <field name="supported_country_ids" eval="[Command.set([ref('base.cl')])]"/>
+    </record>
+</odoo>

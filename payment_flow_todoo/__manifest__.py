@@ -2,12 +2,16 @@
 
 {
     'name': 'Flow Payment Provider',
-    'version': "16.0.1.0.6",
+    'version': "19.0.1.0.0",
     'summary': 'Chilean Flow Payment Provider',
-    'description': """Payment Provider: Chilean Flow Payment Provider""",
+    'description': """Payment Provider: Chilean Flow Payment Provider.
+
+Port a Odoo 19 (Outside Sports): API de proveedores de 19 (_process,
+_apply_updates, payment.method "Flow"), mismas URLs de notificación y retorno.
+""",
     'license': 'AGPL-3',
     'author': "ToDOO Web (www.todooweb.com)",
-    'category': 'Website/Website',
+    'category': 'Accounting/Payment Providers',
     'website': "https://todooweb.com/",
     'contributors': [
         "Antonio David <antoniodavid8@gmail.com>",
@@ -16,25 +20,18 @@
     ],
     'support': 'devtodoo@gmail.com',
     'depends': [
-        'website',
-        'account',
-        'base',
+        'payment',
         'payment_flow_currency_todoo',
     ],
-    'external_dependencies': {
-        'python': [
-            'payflow',
-        ],
-    },
     'data': [
-        'security/ir.model.access.csv',
         'views/payment_flow_templates.xml',
         'views/payment_provider.xml',
         'views/payment_transaction.xml',
+        'data/payment_method_data.xml',
         'data/payment_provider_data.xml',
     ],
     'images': [
-       'static/description/screenshot_pay.png'
+        'static/description/screenshot_pay.png'
     ],
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
