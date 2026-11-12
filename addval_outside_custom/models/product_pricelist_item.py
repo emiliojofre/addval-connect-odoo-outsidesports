@@ -84,3 +84,12 @@ class ProductPricelistItem(models.Model):
                     'categ_id': None,
                 })
         return super().create(vals_list)
+
+    def _show_discount_on_shop(self):
+        """Tienda: precio público tachado solo si la tarifa tiene marcada
+        "Mostrar precio público y descuento en la tienda" (como la política de
+        descuento de Odoo 16)."""
+        if not self:
+            return False
+        self.ensure_one()
+        return self.pricelist_id.show_public_price_on_shop and super()._show_discount_on_shop()

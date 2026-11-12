@@ -13,5 +13,17 @@
         </field>
       </field>
     </record>
+
+    <!-- Port 19: sustituto de la "Política de descuento" de 16, solo para la tienda. -->
+    <record id="pricelist_show_public_price_on_shop" model="ir.ui.view">
+      <field name="name">product.pricelist.form.show.public.price.on.shop</field>
+      <field name="model">product.pricelist</field>
+      <field name="inherit_id" ref="website_sale.website_sale_pricelist_form_view"/>
+      <field name="arch" type="xml">
+        <field name="selectable" position="after">
+          <field name="show_public_price_on_shop"/>
+        </field>
+      </field>
+    </record>
   </data>
 </odoo>

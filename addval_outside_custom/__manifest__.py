@@ -24,6 +24,7 @@
         'account',
         'product',
         'website_product_brands',
+        'website_sale',
         'l10n_cl_edi',
     ],
 
