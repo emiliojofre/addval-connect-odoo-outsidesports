@@ -69,9 +69,23 @@ def _set_b2b_tax_indication(env):
     _logger.info("upgrade19 %s: etiqueta de impuestos '+ IVA' en %s", MODULE, views.ids)
 
 
+def _disable_base_unit_price(env):
+    """En 19 el "Precio de referencia por unidad" (website_sale.group_show_uom_price)
+    se muestra en todas las fichas de producto ("$ 217.588 / Unidad(es)").
+    Outside Sports no lo usa: se desactiva como lo hace Ajustes > Sitio web."""
+    implied = env.ref('website_sale.group_show_uom_price', raise_if_not_found=False)
+    if not implied:
+        return
+    groups = env.ref('base.group_user') | env.ref('base.group_portal') | env.ref('base.group_public')
+    groups.sudo()._remove_group(implied)
+    implied.sudo().write({'user_ids': [(5, 0, 0)]})
+    _logger.info("upgrade19 %s: precio por unidad de referencia desactivado", MODULE)
+
+
 def migrate(cr, version):
     env = api.Environment(cr, SUPERUSER_ID, {'active_test': False})
     _drop_obsolete_views(env)
     _set_tax_display(env)
     _set_signup_scope(env)
     _set_b2b_tax_indication(env)
+    _disable_base_unit_price(env)
