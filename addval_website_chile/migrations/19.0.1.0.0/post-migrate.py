@@ -47,8 +47,31 @@ def _set_signup_scope(env):
             _logger.info("upgrade19 %s: registro sitio %s -> %s", MODULE, website.id, value)
 
 
+TAX_INDICATION_B2B = """<t t-name="website_sale.tax_indication">
+        <span t-if="website.show_line_subtotals_tax_selection == 'tax_excluded'" class="fs-6 fw-normal text-muted text-nowrap">+ IVA</span>
+        <span t-else="" class="fs-6 fw-normal text-muted text-nowrap">IVA incluido</span>
+    </t>"""
+
+
+def _set_b2b_tax_indication(env):
+    """La copia B2B de website_sale.tax_indication viene de 16 con la etiqueta
+    vacía (un carácter invisible): en el editor web de 19 el texto que se
+    escribe junto al precio cae dentro del campo "Precio de venta" y el editor
+    intenta guardar "$ 151.008 + IVA" como precio (error de validación).
+    Se reescribe con la estructura de 19 y el texto "+ IVA" de 16."""
+    views = env['ir.ui.view'].search([
+        ('key', '=', 'website_sale.tax_indication'),
+        ('website_id', '!=', False),
+        ('website_id', '!=', B2C_WEBSITE_ID),
+    ])
+    for view in views:
+        view.with_context(no_cow=True).write({'arch': TAX_INDICATION_B2B})
+    _logger.info("upgrade19 %s: etiqueta de impuestos '+ IVA' en %s", MODULE, views.ids)
+
+
 def migrate(cr, version):
     env = api.Environment(cr, SUPERUSER_ID, {'active_test': False})
     _drop_obsolete_views(env)
     _set_tax_display(env)
     _set_signup_scope(env)
+    _set_b2b_tax_indication(env)
