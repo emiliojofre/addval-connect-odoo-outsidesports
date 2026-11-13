@@ -82,6 +82,30 @@ def _disable_base_unit_price(env):
     _logger.info("upgrade19 %s: precio por unidad de referencia desactivado", MODULE)
 
 
+HIDDEN_HEADER_VIEWS = ['website.header_text_element', 'website.header_call_to_action']
+HEADER_WEBSITE_IDS = [2, B2C_WEBSITE_ID]  # B2B y B2C
+
+
+def _hide_header_phone_and_cta(env):
+    """Oculta en el encabezado el teléfono (bloque de texto) y el botón
+    "Contáctenos" en B2B y B2C, igual que las opciones "Visuales: T" y
+    "Acciones: llamada a la acción" del editor (vistas por sitio)."""
+    View = env['ir.ui.view']
+    for website_id in HEADER_WEBSITE_IDS:
+        for key in HIDDEN_HEADER_VIEWS:
+            view = View.search([('key', '=', key), ('website_id', '=', website_id)], limit=1)
+            if not view:
+                generic = View.search([('key', '=', key), ('website_id', '=', False)], limit=1)
+                if not generic:
+                    continue
+                # Escribir con website_id en el contexto crea la copia del sitio.
+                generic.with_context(website_id=website_id).write({'active': False})
+            elif view.active:
+                view.write({'active': False})
+    _logger.info("upgrade19 %s: teléfono y Contáctenos ocultos en el encabezado de %s",
+                 MODULE, HEADER_WEBSITE_IDS)
+
+
 def migrate(cr, version):
     env = api.Environment(cr, SUPERUSER_ID, {'active_test': False})
     _drop_obsolete_views(env)
@@ -89,3 +113,4 @@ def migrate(cr, version):
     _set_signup_scope(env)
     _set_b2b_tax_indication(env)
     _disable_base_unit_price(env)
+    _hide_header_phone_and_cta(env)
